@@ -36,6 +36,7 @@ public class ProductsPresenter implements ProductsContract.Presenter {
 
     @Override
     public void getProduct(String ean) {
+        Log.d("PROD_PRES", "Get product : " + ean);
 
         checkNotNull(ean, "ean cannot be null!");
         mUseCaseHandler.execute(mGetProduct, new GetProduct.RequestValues(ean),
@@ -44,6 +45,7 @@ public class ProductsPresenter implements ProductsContract.Presenter {
                     @Override
                     public void onSuccess(GetProduct.ResponseValue response) {
                         Product produitResponse = response.getProduct();
+                        Log.d("PROD_PRES", "success");
                         if(produitResponse != null)
                             mProductsView.showProduct(response.getProduct());
                         else

@@ -38,7 +38,7 @@ public class ProductActivityTestEspresso {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             getInstrumentation().getUiAutomation().executeShellCommand(
                     "pm grant " + getTargetContext().getPackageName()
-                            + " android.permission.CALL_PHONE");
+                            + " android.permission.CAMERA");
         }
     }
 

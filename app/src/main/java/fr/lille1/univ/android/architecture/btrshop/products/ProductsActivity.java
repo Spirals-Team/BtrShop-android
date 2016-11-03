@@ -11,6 +11,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 
 import fr.lille1.univ.android.architecture.btrshop.R;
@@ -114,6 +115,7 @@ public class ProductsActivity extends AppCompatActivity {
         if (requestCode == 1) {
             if(resultCode == Activity.RESULT_OK){
                 String result = data.getStringExtra("result");
+                Log.d("PROD_ACTIVITY", "result : " + result);
                 mProductsPresenter.getProduct(result);
             }
             if (resultCode == Activity.RESULT_CANCELED) {

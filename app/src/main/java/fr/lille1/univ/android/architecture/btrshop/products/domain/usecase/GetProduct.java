@@ -1,6 +1,7 @@
 package fr.lille1.univ.android.architecture.btrshop.products.domain.usecase;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import fr.lille1.univ.android.architecture.btrshop.UseCase;
 import fr.lille1.univ.android.architecture.btrshop.products.domain.model.Product;
@@ -24,6 +25,7 @@ public class GetProduct extends UseCase<GetProduct.RequestValues, GetProduct.Res
 
     @Override
     protected void executeUseCase(final GetProduct.RequestValues values) {
+        Log.d("GETPRODUCT", "Execute ");
         String ean = values.getProductEan();
         Product product = mProductsRepository.getProduct(ean);
         getUseCaseCallback().onSuccess(new ResponseValue(product));
@@ -35,6 +37,7 @@ public class GetProduct extends UseCase<GetProduct.RequestValues, GetProduct.Res
         private final String mProductEan;
 
         public RequestValues(@NonNull String productEan) {
+            Log.d("GETPRODUCT", "RequestValues : " +productEan);
             mProductEan = checkNotNull(productEan, "productEan cannot be null!");
         }
 
@@ -48,6 +51,7 @@ public class GetProduct extends UseCase<GetProduct.RequestValues, GetProduct.Res
         private Product mProduct;
 
         public ResponseValue(@NonNull Product product) {
+            Log.d("GETPRODUCT", "Response Product ");
             mProduct = product;
         }
 

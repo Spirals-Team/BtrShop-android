@@ -20,6 +20,7 @@ public final class Product {
     @SerializedName("poids")
     private String poids;
 
+
     /**
      * Constructor.
      *

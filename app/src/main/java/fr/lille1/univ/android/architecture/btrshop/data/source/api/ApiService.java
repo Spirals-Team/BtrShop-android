@@ -11,7 +11,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
  **/
 public class ApiService {
 
-    public static final String BASE_URL = "https://btrshopcloud.herokuapp.com/products";
+    public static final String BASE_URL = "https://btrshopcloud.herokuapp.com/";
     private static Retrofit retrofit = null;
 
     /**

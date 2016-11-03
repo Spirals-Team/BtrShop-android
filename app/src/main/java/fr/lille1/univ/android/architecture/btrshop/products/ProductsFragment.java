@@ -10,6 +10,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -96,6 +97,7 @@ public class ProductsFragment extends Fragment implements ProductsContract.View 
 
     @Override
     public void showProduct(Product product){
+        Log.d("PROD_FRAG", "Affiche product");
         // Set product field
         name = (TextView) getActivity().findViewById(R.id.name);
         name.setVisibility(View.VISIBLE);
