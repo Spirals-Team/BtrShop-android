@@ -3,6 +3,9 @@ package fr.lille1.univ.android.architecture.btrshop.products;
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -10,12 +13,19 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import com.afollestad.materialdialogs.MaterialDialog;
+
+import java.io.InputStream;
+import java.net.URL;
 
 import fr.lille1.univ.android.architecture.btrshop.R;
 
@@ -35,12 +45,25 @@ public class ProductsFragment extends Fragment implements ProductsContract.View 
 
     private ProductsContract.Presenter mPresenter;
 
+    //handles the progressbar
     public ProgressBar mProgressBar;
-    private TextView name;
-    private TextView ean;
-    private TextView description;
+
+
+    //handles the differents linearlayouts
+    private TextView brand;
     private TextView category;
-    private TextView poids;
+    private TextView color;
+    private TextView description;
+    private TextView dimensions;
+    private TextView ean;
+    private TextView offers;
+    private TextView model;
+    private TextView name;
+    private TextView weight;
+
+    //handles the cover image
+    private ImageView logo;
+    private Bitmap bmp;
 
     public ProductsFragment() {
         // Requires empty public constructor
@@ -98,29 +121,109 @@ public class ProductsFragment extends Fragment implements ProductsContract.View 
     }
 
     @Override
-    public void showProduct(Product product){
+    public void showProduct(final Product product){
 
         ProductsActivity.dialog.dismiss();
 
         Log.d("PROD_FRAG", "Affiche product");
         // Set product field
-        name = (TextView) getActivity().findViewById(R.id.name);
-        name.setVisibility(View.VISIBLE);
-        ean = (TextView) getActivity().findViewById(R.id.ean);
-        ean.setVisibility(View.VISIBLE);
-        description = (TextView) getActivity().findViewById(R.id.description);
-        description.setVisibility(View.VISIBLE);
-        category = (TextView) getActivity().findViewById(R.id.category);
-        category.setVisibility(View.VISIBLE);
-        poids = (TextView) getActivity().findViewById(R.id.poids);
-        poids.setVisibility(View.VISIBLE);
+
+        brand = (TextView) getActivity().findViewById(R.id.products_fragment_brand);
+        category = (TextView) getActivity().findViewById(R.id.products_fragment_category);
+        color = (TextView) getActivity().findViewById(R.id.products_fragment_color);
+        description = (TextView) getActivity().findViewById(R.id.products_fragment_description);
+        dimensions = (TextView) getActivity().findViewById(R.id.products_fragment_dimensions);
+        ean = (TextView) getActivity().findViewById(R.id.products_fragment_ean);
+        offers = (TextView) getActivity().findViewById(R.id.products_fragment_offers);
+        model = (TextView) getActivity().findViewById(R.id.products_fragment_model);
+        name = (TextView) getActivity().findViewById(R.id.products_fragment_name);
+        weight = (TextView) getActivity().findViewById(R.id.products_fragment_weight);
+
+
+        //cover image
+        logo = (ImageView) getActivity().findViewById(R.id.products_fragment_logo);
+
+
         if (product != null){
-            name.setText(product.getName());
-            description.setText(product.getDescription());
-            category.setText(product.getCategory());
-            ean.setText(product.getEan());
-            poids.setText(product.getPoids());
+
+            if (product.getBrand() != null){
+                brand.setText(product.getBrand());
+                brand.setVisibility(View.VISIBLE);
+            }
+            if (product.getCategory() != null){
+                category.setText(product.getCategory());
+                category.setVisibility(View.VISIBLE);
+            }
+            if (product.getColor() != null){
+                color.setText(product.getColor());
+                color.setVisibility(View.VISIBLE);
+            }
+            if (product.getDescription() != null){
+                description.setText(product.getDescription());
+                description.setVisibility(View.VISIBLE);
+            }
+            // height x width x depth
+            String hwd = "";
+            if (product.getHeight() != null ){
+                hwd += "height: " + product.getHeight();
+            }
+            if (product.getWidth() != null){
+                hwd += " width: " + product.getWidth();
+            }
+            if (product.getDepth() != null){
+                hwd += " depth: " + product.getDepth();
+            }
+            if (product.getHeight() != null || product.getWidth() != null || product.getDepth() != null ){
+                dimensions.setText(hwd);
+                dimensions.setVisibility(View.VISIBLE);
+            }
+            if (product.getEan() != null){
+                ean.setText(product.getEan());
+                ean.setVisibility(View.VISIBLE);
+            }
+            if (product.getOffers().length >= 1 && product.getOffers()[0] != null){
+                    brand.setText(product.getOffers()[0].toString());
+                    brand.setVisibility(View.VISIBLE);
+            }
+            if (product.getModel() != null){
+                model.setText(product.getModel());
+                model.setVisibility(View.VISIBLE);
+            }
+            if (product.getName() != null){
+                name.setText(product.getName());
+                name.setVisibility(View.VISIBLE);
+            }
+            if (product.getModel() != null){
+                model.setText(product.getModel());
+                model.setVisibility(View.VISIBLE);
+            }
+            if (product.getWeight() != null){
+                weight.setText(product.getWeight().getValue() + " " + product.getWeight().getUnitText());
+                weight.setVisibility(View.VISIBLE);
+            }
         }
+
+
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    InputStream in = new URL(product.getLogo()).openStream();
+                    bmp = BitmapFactory.decodeStream(in);
+                } catch (Exception e) {
+                    // log error
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void result) {
+                if (bmp != null)
+                    logo.setImageBitmap(bmp);
+                    logo.setVisibility(View.VISIBLE);
+            }
+
+        }.execute();
 
     }
 
@@ -129,9 +232,15 @@ public class ProductsFragment extends Fragment implements ProductsContract.View 
 
         ProductsActivity.dialog.dismiss();
 
-        new AlertDialog.Builder(getContext())
+        MaterialDialog dialog = new MaterialDialog.Builder(getContext())
+                .title("No Product !")
+                .content("There is no product with this ean ! ")
+                .positiveText("Ok")
+                .show();
+
+        /* new AlertDialog.Builder(getContext())
                 .setTitle("No Product !")
-                .setMessage("There is no product with this ean ! ")
+                .setMessage()
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         name = (TextView) getActivity().findViewById(R.id.name);
@@ -147,7 +256,7 @@ public class ProductsFragment extends Fragment implements ProductsContract.View 
                     }
                 })
                 .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
+                .show(); */
     }
 
     @Override

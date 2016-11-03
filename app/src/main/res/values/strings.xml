@@ -50,5 +50,15 @@
     <string name="menu_clear">clear</string>
     <string name="refresh">refresh</string>
     <string name="nav_all">Tous</string>
+    <string name="info_product_name">Product Name</string>
+    <string name="info_product_description">Description</string>
+    <string name="info_product_ean">EAN</string>
+    <string name="info_product_category">Category</string>
+    <string name="info_product_weight">Weight</string>
+    <string name="info_product_brand">Brand</string>
+    <string name="info_product_color">Color</string>
+    <string name="info_product_dimensions">Dimensions</string>
+    <string name="info_product_offers">Offers</string>
+    <string name="info_product_model">Model</string>
 
 </resources>
