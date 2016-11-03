@@ -1,7 +1,6 @@
 package fr.lille1.univ.android.architecture.btrshop.products;
 
 import android.Manifest;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -11,14 +10,12 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -27,11 +24,11 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import java.io.InputStream;
 import java.net.URL;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import fr.lille1.univ.android.architecture.btrshop.R;
-
 import fr.lille1.univ.android.architecture.btrshop.products.domain.model.Product;
 import fr.lille1.univ.android.architecture.btrshop.scanner.ScannerActivity;
-
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -48,21 +45,30 @@ public class ProductsFragment extends Fragment implements ProductsContract.View 
     //handles the progressbar
     public ProgressBar mProgressBar;
 
+    //handles the differents elements
+    @BindView(R.id.products_fragment_brand) TextView brand;
+    @BindView(R.id.products_fragment_category) TextView category;
+    @BindView(R.id.products_fragment_color) TextView color;
+    @BindView(R.id.products_fragment_description) TextView description;
+    @BindView(R.id.products_fragment_dimensions) TextView dimensions;
+    @BindView(R.id.products_fragment_ean) TextView ean;
+    @BindView(R.id.products_fragment_offers) TextView offers;
+    @BindView(R.id.products_fragment_model) TextView model;
+    @BindView(R.id.products_fragment_name) TextView name;
+    @BindView(R.id.products_fragment_weight) TextView weight;
 
-    //handles the differents linearlayouts
-    private TextView brand;
-    private TextView category;
-    private TextView color;
-    private TextView description;
-    private TextView dimensions;
-    private TextView ean;
-    private TextView offers;
-    private TextView model;
-    private TextView name;
-    private TextView weight;
+    //handles the differents layout
+    @BindView(R.id.products_fragment_brand_layout) LinearLayout layoutBrand;
+    @BindView(R.id.products_fragment_category_layout) LinearLayout layoutCategory;
+    @BindView(R.id.products_fragment_color_layout) LinearLayout layoutColor;
+    @BindView(R.id.products_fragment_dimensions_layout) LinearLayout layoutDimensions;
+    @BindView(R.id.products_fragment_ean_layout) LinearLayout layoutEan;
+    @BindView(R.id.products_fragment_offers_layout) LinearLayout layoutOffers;
+    @BindView(R.id.products_fragment_model_layout) LinearLayout layoutModel;
+    @BindView(R.id.products_fragment_weight_layout) LinearLayout layoutWeight;
 
     //handles the cover image
-    private ImageView logo;
+    @BindView(R.id.products_fragment_logo) ImageView logo;
     private Bitmap bmp;
 
     public ProductsFragment() {
@@ -90,6 +96,7 @@ public class ProductsFragment extends Fragment implements ProductsContract.View 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.articles_frag, container, false);
+        ButterKnife.bind(this,root);
 
         ActivityCompat.requestPermissions(getActivity(),
                 new String[]{Manifest.permission.CAMERA}, ZXING_CAMERA_PERMISSION);
@@ -128,78 +135,61 @@ public class ProductsFragment extends Fragment implements ProductsContract.View 
         Log.d("PROD_FRAG", "Affiche product");
         // Set product field
 
-        brand = (TextView) getActivity().findViewById(R.id.products_fragment_brand);
-        category = (TextView) getActivity().findViewById(R.id.products_fragment_category);
-        color = (TextView) getActivity().findViewById(R.id.products_fragment_color);
-        description = (TextView) getActivity().findViewById(R.id.products_fragment_description);
-        dimensions = (TextView) getActivity().findViewById(R.id.products_fragment_dimensions);
-        ean = (TextView) getActivity().findViewById(R.id.products_fragment_ean);
-        offers = (TextView) getActivity().findViewById(R.id.products_fragment_offers);
-        model = (TextView) getActivity().findViewById(R.id.products_fragment_model);
-        name = (TextView) getActivity().findViewById(R.id.products_fragment_name);
-        weight = (TextView) getActivity().findViewById(R.id.products_fragment_weight);
-
-
-        //cover image
-        logo = (ImageView) getActivity().findViewById(R.id.products_fragment_logo);
-
 
         if (product != null){
 
             if (product.getBrand() != null){
                 brand.setText(product.getBrand());
-                brand.setVisibility(View.VISIBLE);
+                layoutBrand.setVisibility(View.VISIBLE);
             }
             if (product.getCategory() != null){
                 category.setText(product.getCategory());
-                category.setVisibility(View.VISIBLE);
+                layoutCategory.setVisibility(View.VISIBLE);
             }
             if (product.getColor() != null){
                 color.setText(product.getColor());
-                color.setVisibility(View.VISIBLE);
+                layoutColor.setVisibility(View.VISIBLE);
             }
             if (product.getDescription() != null){
                 description.setText(product.getDescription());
-                description.setVisibility(View.VISIBLE);
             }
             // height x width x depth
             String hwd = "";
-            if (product.getHeight() != null ){
-                hwd += "height: " + product.getHeight();
+            if (product.getHeight() != null && product.getHeight().getUnitText() != null){
+                hwd += "height: " + product.getHeight().toString() + "\n";
             }
-            if (product.getWidth() != null){
-                hwd += " width: " + product.getWidth();
+            if (product.getWidth() != null && product.getWidth().getUnitText() != null){
+                hwd += "width: " + product.getWidth().toString() + "\n";
             }
-            if (product.getDepth() != null){
-                hwd += " depth: " + product.getDepth();
+            if (product.getDepth() != null && product.getDepth().getUnitText() != null){
+                hwd += "depth: " + product.getDepth().toString();
             }
             if (product.getHeight() != null || product.getWidth() != null || product.getDepth() != null ){
                 dimensions.setText(hwd);
-                dimensions.setVisibility(View.VISIBLE);
+                layoutDimensions.setVisibility(View.VISIBLE);
             }
             if (product.getEan() != null){
                 ean.setText(product.getEan());
-                ean.setVisibility(View.VISIBLE);
+                layoutEan.setVisibility(View.VISIBLE);
             }
             if (product.getOffers().length >= 1 && product.getOffers()[0] != null){
-                    brand.setText(product.getOffers()[0].toString());
-                    brand.setVisibility(View.VISIBLE);
+                offers.setText(product.getOffers()[0].toString());
+                layoutOffers.setVisibility(View.VISIBLE);
             }
             if (product.getModel() != null){
                 model.setText(product.getModel());
-                model.setVisibility(View.VISIBLE);
+                layoutModel.setVisibility(View.VISIBLE);
             }
             if (product.getName() != null){
                 name.setText(product.getName());
-                name.setVisibility(View.VISIBLE);
             }
             if (product.getModel() != null){
                 model.setText(product.getModel());
-                model.setVisibility(View.VISIBLE);
+                layoutModel.setVisibility(View.VISIBLE);
             }
             if (product.getWeight() != null){
-                weight.setText(product.getWeight().getValue() + " " + product.getWeight().getUnitText());
-                weight.setVisibility(View.VISIBLE);
+                weight.setText(product.getWeight().toString());
+                layoutWeight.setVisibility(View.VISIBLE);
             }
         }
 

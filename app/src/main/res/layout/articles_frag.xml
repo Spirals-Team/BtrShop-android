@@ -64,7 +64,7 @@
             android:orientation="vertical">
 
             <LinearLayout
-
+                android:id="@+id/products_fragment_ean_layout"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:orientation="horizontal"
@@ -90,6 +90,7 @@
 
 
             <LinearLayout
+                android:id="@+id/products_fragment_offers_layout"
                 android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
@@ -114,31 +115,10 @@
                     android:text="@string/info_product_offers" />
             </LinearLayout>
 
-            <LinearLayout
-                android:visibility="gone"
-                android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:orientation="horizontal"
-                android:background="@color/background_text">
 
-                <ImageView
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_weight="0.3"
-                    android:layout_gravity="center_vertical"
-                    android:src="@drawable/ic_weight"/>
-
-                <TextView
-                    android:id="@+id/products_fragment_weight"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@color/background_text"
-                    android:layout_weight="0.7"
-                    android:layout_gravity="center_vertical"
-                    android:text="@string/info_product_weight" />
-            </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/products_fragment_category_layout"
                 android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
@@ -164,6 +144,7 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/products_fragment_brand_layout"
                 android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
@@ -189,6 +170,7 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/products_fragment_color_layout"
                 android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
@@ -214,6 +196,7 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/products_fragment_model_layout"
                 android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
@@ -238,34 +221,8 @@
                     android:text="@string/info_product_model" />
             </LinearLayout>
 
-
-
             <LinearLayout
-                android:visibility="gone"
-                android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:orientation="horizontal"
-                android:background="@color/background_text">
-
-                <ImageView
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_weight="0.3"
-                    android:layout_gravity="center_vertical"
-                    android:src="@drawable/ic_weight"/>
-
-                <TextView
-                    android:id="@+id/products_fragment_weight"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@color/background_text"
-                    android:layout_weight="0.7"
-                    android:layout_gravity="center_vertical"
-                    android:text="@string/info_product_weight" />
-            </LinearLayout>
-
-
-            <LinearLayout
+                android:id="@+id/products_fragment_dimensions_layout"
                 android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
@@ -288,6 +245,31 @@
                     android:maxWidth="40dp"
                     android:layout_gravity="center_vertical"
                     android:text="@string/info_product_dimensions" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/products_fragment_weight_layout"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:orientation="horizontal"
+                android:background="@color/background_text">
+
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_weight="0.3"
+                    android:layout_gravity="center_vertical"
+                    android:src="@drawable/ic_weight"/>
+
+                <TextView
+                    android:id="@+id/products_fragment_weight"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@color/background_text"
+                    android:layout_weight="0.7"
+                    android:layout_gravity="center_vertical"
+                    android:text="@string/info_product_weight" />
             </LinearLayout>
 
 

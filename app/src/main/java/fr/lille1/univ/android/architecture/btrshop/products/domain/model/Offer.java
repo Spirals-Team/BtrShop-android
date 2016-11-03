@@ -94,4 +94,9 @@ public class Offer {
         result = 31 * result + (validFrom != null ? validFrom.hashCode() : 0);
         return result;
     }
+
+    @Override
+    public String toString() {
+        return price + " " + priceCurrency;
+    }
 }
