@@ -2,8 +2,12 @@ package fr.lille1.univ.android.architecture;
 
 import android.content.Intent;
 import android.os.Build;
+import android.provider.MediaStore;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
+import android.support.test.uiautomator.UiObject;
+import android.support.test.uiautomator.UiObjectNotFoundException;
+import android.support.test.uiautomator.UiSelector;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -31,21 +35,11 @@ public class ProductActivityTestEspresso {
     public ActivityTestRule<ProductsActivity> mActivityProduct =
             new ActivityTestRule<>(ProductsActivity.class);
 
-    @Before
-    public void grantPhonePermission() {
-        // In M+, trying to call a number will trigger a runtime dialog. Make sure
-        // the permission is granted before running this test.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            getInstrumentation().getUiAutomation().executeShellCommand(
-                    "pm grant " + getTargetContext().getPackageName()
-                            + " android.permission.CAMERA");
-        }
-    }
-
     @Test
     public void startProductActivity() {
-        mActivityProduct.launchActivity(new Intent());
+        // Test l'activity
         onView(withId(R.id.drawer_layout)).check(matches(isDisplayed()));
+
         // Test si la page s'est ouverte
         onView(withId(R.id.fab_scan_article)).check(matches(isDisplayed()));
         // Test du click sur du scan

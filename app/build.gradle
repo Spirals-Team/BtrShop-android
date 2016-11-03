@@ -119,3 +119,19 @@ dependencies {
     androidTestCompile "com.google.dexmaker:dexmaker:1.2"
     androidTestCompile "com.google.dexmaker:dexmaker-mockito:1.2"
 }
+// Need to
+android.applicationVariants.all { variant ->
+    if (variant.getBuildType().name == "debug") {
+        task "configDevice${variant.name.capitalize()}" (type: Exec){
+            dependsOn variant.install
+
+            group = 'acceptPermission'
+            description = 'Describe your task here.'
+
+            def adb = android.getAdbExe().toString()
+            def mypermission = 'android.permission.CAMERA'
+            commandLine "$adb shell pm grant ${variant.applicationId} $mypermission".split(' ')
+        }
+        variant.testVariant.connectedInstrumentTest.dependsOn "configDevice${variant.name.capitalize()}"
+    }
+}
