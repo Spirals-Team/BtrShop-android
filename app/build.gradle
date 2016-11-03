@@ -75,6 +75,9 @@ dependencies {
     compile "com.android.support.test.espresso:espresso-idling-resource:$rootProject.espressoVersion"
     compile "com.google.guava:guava:$rootProject.guavaVersion"
 
+    // Material Dialog ProgressBar UI
+    compile 'com.afollestad.material-dialogs:core:0.9.0.2'
+
     // Dependencies for scan bar
     compile "me.dm7.barcodescanner:zxing:1.9"
 
@@ -101,6 +104,11 @@ dependencies {
     androidTestCompile "com.android.support.test.espresso:espresso-core:$rootProject.espressoVersion"
     androidTestCompile "com.android.support.test.espresso:espresso-contrib:$rootProject.espressoVersion"
     androidTestCompile "com.android.support.test.espresso:espresso-intents:$rootProject.espressoVersion"
+
+    // UIAutomator UI Testing
+    androidTestCompile 'com.android.support.test.uiautomator:uiautomator-v18:2.1.1'
+
+
 
     // Resolve conflicts between main and test APK:
     androidTestCompile "com.android.support:support-annotations:$rootProject.supportLibraryVersion"

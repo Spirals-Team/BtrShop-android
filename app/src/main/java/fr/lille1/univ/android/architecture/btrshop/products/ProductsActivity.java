@@ -13,10 +13,16 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ProgressBar;
+
+import com.afollestad.materialdialogs.MaterialDialog;
 
 import fr.lille1.univ.android.architecture.btrshop.R;
 
 import fr.lille1.univ.android.architecture.btrshop.data.source.Injection;
+import fr.lille1.univ.android.architecture.btrshop.products.domain.model.Product;
+import fr.lille1.univ.android.architecture.btrshop.products.domain.usecase.GetProduct;
 import fr.lille1.univ.android.architecture.btrshop.util.ActivityUtils;
 import fr.lille1.univ.android.architecture.btrshop.util.EspressoIdlingResource;
 
@@ -25,10 +31,12 @@ public class ProductsActivity extends AppCompatActivity {
 
 
     private static final String CURRENT_FILTERING_KEY = "CURRENT_FILTERING_KEY";
+    private static final int LOADER_ID = 1;
 
     private DrawerLayout mDrawerLayout;
 
     private ProductsPresenter mProductsPresenter;
+    static MaterialDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,6 +124,13 @@ public class ProductsActivity extends AppCompatActivity {
             if(resultCode == Activity.RESULT_OK){
                 String result = data.getStringExtra("result");
                 Log.d("PROD_ACTIVITY", "result : " + result);
+                dialog = new MaterialDialog.Builder(this)
+                        .title("Récupération produit")
+                        .content("Veuillez patientez ...")
+                        .progress(true, 0)
+                        .show();
+
+
                 mProductsPresenter.getProduct(result);
             }
             if (resultCode == Activity.RESULT_CANCELED) {
@@ -123,4 +138,5 @@ public class ProductsActivity extends AppCompatActivity {
             }
         }
     }
+
 }

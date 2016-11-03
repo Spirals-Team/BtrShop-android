@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import fr.lille1.univ.android.architecture.btrshop.R;
@@ -34,6 +35,7 @@ public class ProductsFragment extends Fragment implements ProductsContract.View 
 
     private ProductsContract.Presenter mPresenter;
 
+    public ProgressBar mProgressBar;
     private TextView name;
     private TextView ean;
     private TextView description;
@@ -97,6 +99,9 @@ public class ProductsFragment extends Fragment implements ProductsContract.View 
 
     @Override
     public void showProduct(Product product){
+
+        ProductsActivity.dialog.dismiss();
+
         Log.d("PROD_FRAG", "Affiche product");
         // Set product field
         name = (TextView) getActivity().findViewById(R.id.name);
@@ -116,16 +121,29 @@ public class ProductsFragment extends Fragment implements ProductsContract.View 
             ean.setText(product.getEan());
             poids.setText(product.getPoids());
         }
+
     }
 
     @Override
     public void showError() {
+
+        ProductsActivity.dialog.dismiss();
+
         new AlertDialog.Builder(getContext())
                 .setTitle("No Product !")
                 .setMessage("There is no product with this ean ! ")
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        // Do nothing
+                        name = (TextView) getActivity().findViewById(R.id.name);
+                        name.setVisibility(View.INVISIBLE);
+                        ean = (TextView) getActivity().findViewById(R.id.ean);
+                        ean.setVisibility(View.INVISIBLE);
+                        description = (TextView) getActivity().findViewById(R.id.description);
+                        description.setVisibility(View.INVISIBLE);
+                        category = (TextView) getActivity().findViewById(R.id.category);
+                        category.setVisibility(View.INVISIBLE);
+                        poids = (TextView) getActivity().findViewById(R.id.poids);
+                        poids.setVisibility(View.INVISIBLE);
                     }
                 })
                 .setIcon(android.R.drawable.ic_dialog_alert)
