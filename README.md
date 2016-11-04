@@ -30,3 +30,15 @@ This project use the MVP CLEAN ARCHITECTURE (BLUEPRINTS) :
 
 Tests are written with Espresso.
 
+## Screenshots
+
+![screenshot main activity](https://www.pictshare.net/4f04291889.jpg)
+
+![screenshot scan a product](https://www.pictshare.net/8e39bf4bc7.jpg)
+
+![screenshot error no product found](https://www.pictshare.net/6f4662ba44.jpg)
+
+![screenshot product detail 1](https://www.pictshare.net/23f53dee08.jpg)
+
+![screenshot product detail 2](https://www.pictshare.net/1ef98ee3b4.jpg)
+
