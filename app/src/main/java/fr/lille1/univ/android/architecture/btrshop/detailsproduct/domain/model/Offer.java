@@ -1,14 +1,15 @@
-package fr.lille1.univ.android.architecture.btrshop.products.domain.model;
+package fr.lille1.univ.android.architecture.btrshop.detailsproduct.domain.model;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * Created by denis on 03/11/2016.
  */
 
-public class Offer {
+public class Offer implements Serializable {
 
 
 

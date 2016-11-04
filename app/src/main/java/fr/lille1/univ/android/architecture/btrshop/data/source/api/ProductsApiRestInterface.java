@@ -1,6 +1,6 @@
 package fr.lille1.univ.android.architecture.btrshop.data.source.api;
 
-import fr.lille1.univ.android.architecture.btrshop.products.domain.model.Product;
+import fr.lille1.univ.android.architecture.btrshop.detailsproduct.domain.model.Product;
 
 import retrofit2.Call;
 import retrofit2.http.GET;

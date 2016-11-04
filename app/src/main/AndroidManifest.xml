@@ -36,6 +36,9 @@
             </intent-filter>
         </activity>
         <activity android:name="fr.lille1.univ.android.architecture.btrshop.scanner.ScannerActivity" />
+        <activity android:name=".detailsproduct.DetailsProductActivity"
+            android:label="@string/title_activity_details_product"
+            android:theme="@style/AppTheme"/>
 
     </application>
 

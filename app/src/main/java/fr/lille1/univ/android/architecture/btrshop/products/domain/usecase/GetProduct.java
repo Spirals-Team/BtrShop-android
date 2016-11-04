@@ -4,7 +4,7 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import fr.lille1.univ.android.architecture.btrshop.UseCase;
-import fr.lille1.univ.android.architecture.btrshop.products.domain.model.Product;
+import fr.lille1.univ.android.architecture.btrshop.detailsproduct.domain.model.Product;
 import fr.lille1.univ.android.architecture.btrshop.data.source.ProductsRepository;
 
 

@@ -1,30 +1,25 @@
-package fr.lille1.univ.android.architecture.btrshop.products;
+package fr.lille1.univ.android.architecture.btrshop.detailsproduct;
 
 import fr.lille1.univ.android.architecture.btrshop.BasePresenter;
 import fr.lille1.univ.android.architecture.btrshop.BaseView;
+import fr.lille1.univ.android.architecture.btrshop.products.ProductsContract;
 import fr.lille1.univ.android.architecture.btrshop.detailsproduct.domain.model.Product;
 
 /**
- * Created by charlie on 20/10/16.
+ * Created by charlie on 04/11/16.
  */
 
-public interface ProductsContract {
+public class DetailsProductContract {
 
     interface View extends BaseView<Presenter> {
 
-        void showScan();
-
         void showProduct(Product product);
-
-        void showError();
 
     }
 
     interface Presenter extends BasePresenter {
 
-        void scanProduct();
-
-        void getProduct(String ean);
+        void showDetailedProduct(Product product);
 
     }
 }

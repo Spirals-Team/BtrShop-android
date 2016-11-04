@@ -5,7 +5,7 @@ import android.util.Log;
 
 import fr.lille1.univ.android.architecture.btrshop.UseCase;
 import fr.lille1.univ.android.architecture.btrshop.UseCaseHandler;
-import fr.lille1.univ.android.architecture.btrshop.products.domain.model.Product;
+import fr.lille1.univ.android.architecture.btrshop.detailsproduct.domain.model.Product;
 import fr.lille1.univ.android.architecture.btrshop.products.domain.usecase.GetProduct;
 
 import static com.google.common.base.Preconditions.checkNotNull;

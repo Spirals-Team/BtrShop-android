@@ -60,5 +60,6 @@
     <string name="info_product_dimensions">Dimensions</string>
     <string name="info_product_offers">Offers</string>
     <string name="info_product_model">Model</string>
+    <string name="title_activity_details_product">Details Product</string>
 
 </resources>

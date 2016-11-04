@@ -1,7 +1,8 @@
-package fr.lille1.univ.android.architecture.btrshop.products.domain.model;
+package fr.lille1.univ.android.architecture.btrshop.detailsproduct.domain.model;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
 /**
@@ -10,7 +11,7 @@ import java.util.Arrays;
  *
  * Immutable model class for a Product.
  */
-public final class Product {
+public final class Product implements Serializable{
 
 
 

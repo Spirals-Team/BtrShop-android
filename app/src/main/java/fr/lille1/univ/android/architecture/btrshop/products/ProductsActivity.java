@@ -13,16 +13,12 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.ProgressBar;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 
 import fr.lille1.univ.android.architecture.btrshop.R;
 
 import fr.lille1.univ.android.architecture.btrshop.data.source.Injection;
-import fr.lille1.univ.android.architecture.btrshop.products.domain.model.Product;
-import fr.lille1.univ.android.architecture.btrshop.products.domain.usecase.GetProduct;
 import fr.lille1.univ.android.architecture.btrshop.util.ActivityUtils;
 import fr.lille1.univ.android.architecture.btrshop.util.EspressoIdlingResource;
 
