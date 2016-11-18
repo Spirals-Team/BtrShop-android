@@ -61,5 +61,6 @@
     <string name="info_product_offers">Offers</string>
     <string name="info_product_model">Model</string>
     <string name="title_activity_details_product">Details Product</string>
+    <string name="base_url_api">https://btrshopcloud.herokuapp.com/</string>
 
 </resources>
