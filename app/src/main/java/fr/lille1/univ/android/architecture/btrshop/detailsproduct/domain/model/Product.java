@@ -11,6 +11,13 @@ import java.util.Arrays;
  *
  * Immutable model class for a Product.
  */
+
+/**
+ *  Class for retaining a product
+ *  Any offered product or service.
+ *  Match with product schema
+ *  Refer to https://schema.org/Product
+ */
 public final class Product implements Serializable{
 
 

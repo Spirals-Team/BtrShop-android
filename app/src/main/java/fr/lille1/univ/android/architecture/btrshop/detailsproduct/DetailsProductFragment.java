@@ -105,21 +105,11 @@ public class DetailsProductFragment extends Fragment implements DetailsProductCo
     public void showProduct(final Product product) {
         if (product != null){
 
-            if (product.getBrand() != null){
-                brand.setText(product.getBrand());
-                layoutBrand.setVisibility(View.VISIBLE);
-            }
-            if (product.getCategory() != null){
-                category.setText(product.getCategory());
-                layoutCategory.setVisibility(View.VISIBLE);
-            }
-            if (product.getColor() != null){
-                color.setText(product.getColor());
-                layoutColor.setVisibility(View.VISIBLE);
-            }
-            if (product.getDescription() != null){
-                description.setText(product.getDescription());
-            }
+            show (brand, layoutBrand, product.getBrand());
+            show (category, layoutCategory, product.getCategory());
+            show (color, layoutColor, product.getColor());
+            show (description, null, product.getDescription());
+
             // height x width x depth
             String hwd = "";
             if (product.getHeight() != null && product.getHeight().getUnitText() != null){
@@ -131,33 +121,16 @@ public class DetailsProductFragment extends Fragment implements DetailsProductCo
             if (product.getDepth() != null && product.getDepth().getUnitText() != null){
                 hwd += "depth: " + product.getDepth().toString();
             }
-            if (product.getHeight() != null || product.getWidth() != null || product.getDepth() != null ){
-                dimensions.setText(hwd);
-                layoutDimensions.setVisibility(View.VISIBLE);
-            }
-            if (product.getEan() != null){
-                ean.setText(product.getEan());
-                layoutEan.setVisibility(View.VISIBLE);
-            }
+            show (dimensions, layoutDimensions, hwd);
+
+            show (ean, layoutEan, product.getEan());
             if (product.getOffers().length >= 1 && product.getOffers()[0] != null){
                 offers.setText(product.getOffers()[0].toString());
                 layoutOffers.setVisibility(View.VISIBLE);
             }
-            if (product.getModel() != null){
-                model.setText(product.getModel());
-                layoutModel.setVisibility(View.VISIBLE);
-            }
-            if (product.getName() != null){
-                name.setText(product.getName());
-            }
-            if (product.getModel() != null){
-                model.setText(product.getModel());
-                layoutModel.setVisibility(View.VISIBLE);
-            }
-            if (product.getWeight() != null){
-                weight.setText(product.getWeight().toString());
-                layoutWeight.setVisibility(View.VISIBLE);
-            }
+            show (model, layoutModel, product.getModel());
+            show (name, null, product.getName());
+            show (weight, layoutWeight, product.getWeight().toString());
         }
 
 
@@ -183,6 +156,15 @@ public class DetailsProductFragment extends Fragment implements DetailsProductCo
         }.execute();
 
 
+    }
+
+    private void show (TextView view, LinearLayout layout, String value){
+        if (value != null && !value.trim().isEmpty() ){
+            view.setText(value);
+            if (layout != null) {
+                layout.setVisibility(View.VISIBLE);
+            }
+        }
     }
 
     @Override
