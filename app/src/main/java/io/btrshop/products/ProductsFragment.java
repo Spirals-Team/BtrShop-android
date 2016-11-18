@@ -107,31 +107,12 @@ public class ProductsFragment extends Fragment implements ProductsContract.View 
 
         ProductsActivity.dialog.dismiss();
 
-        MaterialDialog dialog = new MaterialDialog.Builder(getContext())
+        new MaterialDialog.Builder(getContext())
                 .title("No Product !")
                 .content("There is no product with this ean ! ")
                 .positiveText("Ok")
                 .show();
 
-        /* new AlertDialog.Builder(getContext())
-                .setTitle("No Product !")
-                .setMessage()
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        name = (TextView) getActivity().findViewById(R.id.name);
-                        name.setVisibility(View.INVISIBLE);
-                        ean = (TextView) getActivity().findViewById(R.id.ean);
-                        ean.setVisibility(View.INVISIBLE);
-                        description = (TextView) getActivity().findViewById(R.id.description);
-                        description.setVisibility(View.INVISIBLE);
-                        category = (TextView) getActivity().findViewById(R.id.category);
-                        category.setVisibility(View.INVISIBLE);
-                        poids = (TextView) getActivity().findViewById(R.id.poids);
-                        poids.setVisibility(View.INVISIBLE);
-                    }
-                })
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show(); */
     }
 
     @Override
