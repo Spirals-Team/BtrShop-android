@@ -25,10 +25,6 @@ import io.btrshop.util.EspressoIdlingResource;
 
 public class ProductsActivity extends AppCompatActivity {
 
-
-    private static final String CURRENT_FILTERING_KEY = "CURRENT_FILTERING_KEY";
-    private static final int LOADER_ID = 1;
-
     private DrawerLayout mDrawerLayout;
 
     private ProductsPresenter mProductsPresenter;
@@ -96,7 +92,6 @@ public class ProductsActivity extends AppCompatActivity {
                     public boolean onNavigationItemSelected(MenuItem menuItem) {
                         switch (menuItem.getItemId()) {
                             case R.id.list_navigation_menu_item:
-                                // Do nothing, we're already on that screen
                                 break;
                             default:
                                 break;
@@ -128,9 +123,6 @@ public class ProductsActivity extends AppCompatActivity {
 
 
                 mProductsPresenter.getProduct(result);
-            }
-            if (resultCode == Activity.RESULT_CANCELED) {
-                //Write your code if there's no result
             }
         }
     }
