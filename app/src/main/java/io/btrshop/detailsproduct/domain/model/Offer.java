@@ -9,6 +9,12 @@ import java.util.Date;
  * Created by denis on 03/11/2016.
  */
 
+/**
+ *  Class for retaining an offer
+ *  An offer to transfer some rights to an item or to provide a service
+ *  Match with offer schema
+ *  Refer to https://schema.org/Offer
+ */
 public class Offer implements Serializable {
 
 

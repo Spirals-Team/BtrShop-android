@@ -8,6 +8,12 @@ import java.io.Serializable;
  * Created by denis on 03/11/2016.
  */
 
+/**
+ *  Class for retaining a quantitative value
+ *  A point value or interval for product characteristics and other purposes.
+ *  Match with Quantitative value schema
+ *  Refer to https://schema.org/QuantitativeValue
+ */
 public class QuantitativeValue implements Serializable {
 
 

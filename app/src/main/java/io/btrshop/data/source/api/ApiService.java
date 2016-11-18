@@ -1,5 +1,8 @@
 package io.btrshop.data.source.api;
 
+
+import fr.lille1.univ.android.architecture.btrshop.App;
+import fr.lille1.univ.android.architecture.btrshop.R;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -9,9 +12,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
  * Class ApiService : create initialize retrofit.
  *
  **/
-public class ApiService {
+public class ApiService{
 
-    public static final String BASE_URL = "https://btrshopcloud.herokuapp.com/";
+    public static final String BASE_URL = App.getContext().getResources().getString(R.string.base_url_api);
     private static Retrofit retrofit = null;
 
     /**
