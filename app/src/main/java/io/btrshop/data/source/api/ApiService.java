@@ -1,8 +1,8 @@
 package io.btrshop.data.source.api;
 
 
-import fr.lille1.univ.android.architecture.btrshop.App;
-import fr.lille1.univ.android.architecture.btrshop.R;
+import io.btrshop.App;
+import io.btrshop.R;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 

@@ -1,4 +1,4 @@
-package fr.lille1.univ.android.architecture.btrshop;
+package io.btrshop;
 
 import android.app.Application;
 import android.content.Context;
