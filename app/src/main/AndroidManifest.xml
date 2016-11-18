@@ -14,10 +14,16 @@
   ~ limitations under the License.
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="fr.lille1.univ.android.architecture.btrshop">
+    package="io.btrshop">
 
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+
+
 
     <application
         android:allowBackup="false"
@@ -27,7 +33,7 @@
         android:theme="@style/AppTheme">
 
         <activity
-            android:name="fr.lille1.univ.android.architecture.btrshop.products.ProductsActivity"
+            android:name="io.btrshop.products.ProductsActivity"
             android:theme="@style/AppTheme.OverlapSystemBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -35,7 +41,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="fr.lille1.univ.android.architecture.btrshop.scanner.ScannerActivity" />
+        <activity android:name="io.btrshop.scanner.ScannerActivity" />
         <activity android:name=".detailsproduct.DetailsProductActivity"
             android:label="@string/title_activity_details_product"
             android:theme="@style/AppTheme"/>
