@@ -29,33 +29,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class ProductsFragment extends Fragment implements ProductsContract.View {
 
     private static final int ZXING_CAMERA_PERMISSION = 1;
-
     private ProductsContract.Presenter mPresenter;
 
-    //handles the progressbar
-    public ProgressBar mProgressBar;
-
-
-
     public ProductsFragment() {
-        // Requires empty public constructor
     }
 
     public static ProductsFragment newInstance() {
         return new ProductsFragment();
     }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-    }
-
-
 
     @Nullable
     @Override
@@ -63,14 +44,12 @@ public class ProductsFragment extends Fragment implements ProductsContract.View 
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.articles_frag, container, false);
         ButterKnife.bind(this,root);
-
         ActivityCompat.requestPermissions(getActivity(),
                 new String[]{Manifest.permission.CAMERA}, ZXING_CAMERA_PERMISSION);
 
         // Set up floating action button
         FloatingActionButton fab =
                 (FloatingActionButton) getActivity().findViewById(R.id.fab_scan_article);
-
         fab.setImageResource(R.mipmap.ic_barcode);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -78,24 +57,18 @@ public class ProductsFragment extends Fragment implements ProductsContract.View 
                 mPresenter.scanProduct();
             }
         });
-
         setHasOptionsMenu(true);
-
         return root;
     }
 
     @Override
     public void showScan() {
-
         Intent intent = new Intent(getContext(), ScannerActivity.class);
         getActivity().startActivityForResult(intent, 1);
-
-
     }
 
     @Override
     public void showProduct(final Product product){
-
         ProductsActivity.dialog.dismiss();
         Intent detailProductIntent = new Intent(getContext(), DetailsProductActivity.class);
         detailProductIntent.putExtra("product", product);
@@ -106,13 +79,11 @@ public class ProductsFragment extends Fragment implements ProductsContract.View 
     public void showError() {
 
         ProductsActivity.dialog.dismiss();
-
         new MaterialDialog.Builder(getContext())
                 .title("No Product !")
                 .content("There is no product with this ean ! ")
                 .positiveText("Ok")
                 .show();
-
     }
 
     @Override
