@@ -20,8 +20,6 @@ import java.util.Arrays;
  */
 public final class Product implements Serializable{
 
-
-
     @SerializedName("brand")
     private String brand;
 
