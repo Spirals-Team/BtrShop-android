@@ -2,52 +2,101 @@ package io.btrshop.products;
 
 import android.Manifest;
 import android.app.Activity;
+import android.bluetooth.BluetoothManager;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.RemoteException;
+import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.test.espresso.IdlingResource;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.PermissionChecker;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+
+import org.altbeacon.beacon.Beacon;
+import org.altbeacon.beacon.BeaconConsumer;
+import org.altbeacon.beacon.BeaconManager;
+import org.altbeacon.beacon.BeaconParser;
+import org.altbeacon.beacon.BleNotAvailableException;
+import org.altbeacon.beacon.Identifier;
+import org.altbeacon.beacon.MonitorNotifier;
+import org.altbeacon.beacon.RangeNotifier;
+import org.altbeacon.beacon.Region;
+import org.altbeacon.beacon.powersave.BackgroundPowerSaver;
+import org.altbeacon.beacon.utils.UrlBeaconUrlCompressor;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import javax.inject.Inject;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import io.btrshop.BtrShopApplication;
 import io.btrshop.R;
-
 import io.btrshop.detailsproduct.DetailsProductActivity;
 import io.btrshop.detailsproduct.domain.model.Product;
 import io.btrshop.scanner.ScannerActivity;
-import io.btrshop.util.ActivityUtils;
 import io.btrshop.util.EspressoIdlingResource;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 
 
-public class ProductsActivity extends AppCompatActivity implements ProductsContract.View{
+public class ProductsActivity extends AppCompatActivity implements BeaconConsumer, RangeNotifier, ProductsContract.View {
 
-    private DrawerLayout mDrawerLayout;
+    // Constantes
+    private final static int REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS = 124;
+    private final static int REQUEST_PERMISSION_PHONE_STATE = 1;
+    protected final static String TAG = "ProductsFragment";
+
+    // UI
+    @Inject ProductsPresenter mProductsPresenter;
+    @BindView(R.id.drawer_layout)DrawerLayout mDrawerLayout;
+    @BindView(R.id.fab_scan_article) FloatingActionButton fab;
+    //@BindView(R.id.products_test)TextView productTestET;
     static MaterialDialog dialog;
 
-    @Inject
-    ProductsPresenter mProductsPresenter;
-    private static final int ZXING_CAMERA_PERMISSION = 1;
-
+    // Components
+    private BeaconManager mBeaconManager;
+    private BackgroundPowerSaver backgroundPowerSaver;
+    private int targetSdkVersion;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.articles_act);
+
+        // Targer Version
+        try {
+            final PackageInfo info = getApplicationContext().getPackageManager().getPackageInfo(
+                    getApplicationContext().getPackageName(), 0);
+            targetSdkVersion = info.applicationInfo.targetSdkVersion;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        // Injection
+        ButterKnife.bind(this);
+        DaggerProductsComponent.builder()
+                .apiComponent(((BtrShopApplication) getApplicationContext()).getApiComponent())
+                .productsModule(new ProductsModule(this))
+                .build().inject(this);
 
         // Set up the toolbar.
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -56,21 +105,14 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
         ab.setHomeAsUpIndicator(R.drawable.ic_menu);
         ab.setDisplayHomeAsUpEnabled(true);
 
-        // Permission
-        ActivityCompat.requestPermissions(this,
-                new String[]{Manifest.permission.CAMERA}, ZXING_CAMERA_PERMISSION);
-
-
-        // Set up the navigation drawer.
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        // Navigation drawer.
         mDrawerLayout.setStatusBarBackground(R.color.colorPrimaryDark);
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         if (navigationView != null) {
             setupDrawerContent(navigationView);
         }
 
-        FloatingActionButton fab =
-                (FloatingActionButton) findViewById(R.id.fab_scan_article);
+        // Floaction action button
         fab.setImageResource(R.mipmap.ic_barcode);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -80,11 +122,98 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
         });
 
 
-        DaggerProductsComponent.builder()
-                .apiComponent(((BtrShopApplication) getApplicationContext()).getApiComponent())
-                .productsModule(new ProductsModule(this))
-                .build().inject(this);
+        // Permissions and bluetooth
+        verifyBluetooth();
+        checkAndRequestPermissions();
+    }
 
+
+
+    private void checkAndRequestPermissions() {
+        /* Checking for permissions */
+        List<String> permissionsNeeded = new ArrayList<>();
+        final List<String> permissionsList = new ArrayList<>();
+        if (!selfPermissionGranted(Manifest.permission.CAMERA)){
+            permissionsNeeded.add("Camera");
+            permissionsList.add(Manifest.permission.CAMERA);
+        }
+        if (!selfPermissionGranted(Manifest.permission.ACCESS_COARSE_LOCATION)){
+            permissionsNeeded.add("Access Location");
+            permissionsList.add(Manifest.permission.ACCESS_COARSE_LOCATION);
+        }
+
+        /* Asking for permissions */
+        if (permissionsList.size() > 0) {
+            if (permissionsNeeded.size() > 0) {
+                // Need Rationale
+                requestPermissions(permissionsList.toArray(new String[permissionsList.size()]),REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS);
+            }
+            requestPermissions(permissionsList.toArray(new String[permissionsList.size()]),
+                    REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS);
+        }
+    }
+
+
+
+    public boolean selfPermissionGranted(String permission) {
+        // For Android < Android M, self permissions are always granted.
+        boolean result = true;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+            if (targetSdkVersion >= Build.VERSION_CODES.M) {
+                // targetSdkVersion >= Android M, we can
+                // use Context#checkSelfPermission
+                result = getApplicationContext().checkSelfPermission(permission)
+                        == PackageManager.PERMISSION_GRANTED;
+            } else {
+                // targetSdkVersion < Android M, we have to use PermissionChecker
+                result = PermissionChecker.checkSelfPermission(getApplicationContext(), permission)
+                        == PermissionChecker.PERMISSION_GRANTED;
+            }
+        }
+
+        return result;
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mBeaconManager.unbind(this);
+    }
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mBeaconManager = BeaconManager.getInstanceForApplication(this.getApplicationContext());
+
+        // Detect the URL frame:
+        mBeaconManager.getBeaconParsers().add(new BeaconParser().
+                setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"));
+        mBeaconManager.bind(this);
+    }
+
+    public void onBeaconServiceConnect() {
+        Region region = new Region("all-beacons-region", null, null, null);
+        try {
+            mBeaconManager.startRangingBeaconsInRegion(region);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+        mBeaconManager.addRangeNotifier(this);
+    }
+
+    @Override
+    public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
+        for (Beacon beacon: beacons) {
+            if (beacon.getServiceUuid() == 0xfeaa && beacon.getBeaconTypeCode() == 0x10) {
+                // This is a Eddystone-URL frame
+                String url = UrlBeaconUrlCompressor.uncompress(beacon.getId1().toByteArray());
+                Log.d(TAG, "I see a beacon transmitting a url: " + url +
+                        " approximately " + beacon.getDistance() + " meters away.");
+            }
+        }
     }
 
     @Override
@@ -107,7 +236,7 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
-                    public boolean onNavigationItemSelected(MenuItem menuItem) {
+                    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                         switch (menuItem.getItemId()) {
                             case R.id.list_navigation_menu_item:
                                 break;
@@ -168,4 +297,49 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
                 .show();
     }
 
+    private void verifyBluetooth() {
+        try {
+            boolean bluetoothError = false;
+
+            if (android.os.Build.VERSION.SDK_INT < 18) {
+                throw new BleNotAvailableException("Bluetooth LE not supported by this device");
+            }
+            if (!getApplicationContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
+                throw new BleNotAvailableException("Bluetooth LE not supported by this device");
+            } else {
+                if (!((BluetoothManager) getApplicationContext().getSystemService(Context.BLUETOOTH_SERVICE)).getAdapter().isEnabled()) {
+                    bluetoothError = true;
+                }
+            }
+            if(bluetoothError){
+                dialog = new MaterialDialog.Builder(ProductsActivity.this)
+                        .title("Bluetooth not enabled")
+                        .content("Please enable bluetooth in settings and restart this application.")
+                        .positiveText("Ok")
+                        .onAny(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                ActivityCompat.finishAffinity(ProductsActivity.this);
+                                System.exit(0);
+                            }
+                        })
+                        .show();
+            }
+        }
+        catch (RuntimeException e) {
+            dialog = new MaterialDialog.Builder(ProductsActivity.this)
+                    .title("Bluetooth LE not available")
+                    .content("Sorry, this device does not support Bluetooth LE.")
+                    .positiveText("Ok")
+                    .onAny(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                            ActivityCompat.finishAffinity(ProductsActivity.this);
+                            System.exit(0);
+                        }
+                    })
+                    .show();
+        }
+
+    }
 }
