@@ -9,7 +9,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 import android.support.design.widget.FloatingActionButton;
@@ -28,22 +27,14 @@ import android.view.View;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
-
-import org.altbeacon.beacon.Beacon;
-import org.altbeacon.beacon.BeaconConsumer;
-import org.altbeacon.beacon.BeaconManager;
-import org.altbeacon.beacon.BeaconParser;
-import org.altbeacon.beacon.BleNotAvailableException;
-import org.altbeacon.beacon.Identifier;
-import org.altbeacon.beacon.MonitorNotifier;
-import org.altbeacon.beacon.RangeNotifier;
-import org.altbeacon.beacon.Region;
-import org.altbeacon.beacon.powersave.BackgroundPowerSaver;
-import org.altbeacon.beacon.utils.UrlBeaconUrlCompressor;
+import com.estimote.sdk.Beacon;
+import com.estimote.sdk.BeaconManager;
+import com.estimote.sdk.Region;
+import com.estimote.sdk.SystemRequirementsChecker;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 import javax.inject.Inject;
 
@@ -58,7 +49,7 @@ import io.btrshop.util.EspressoIdlingResource;
 
 
 
-public class ProductsActivity extends AppCompatActivity implements BeaconConsumer, RangeNotifier, ProductsContract.View {
+public class ProductsActivity extends AppCompatActivity implements ProductsContract.View {
 
     // Constantes
     private final static int REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS = 124;
@@ -73,8 +64,8 @@ public class ProductsActivity extends AppCompatActivity implements BeaconConsume
     static MaterialDialog dialog;
 
     // Components
-    private BeaconManager mBeaconManager;
-    private BackgroundPowerSaver backgroundPowerSaver;
+    private BeaconManager beaconManager;
+    private Region region;
     private int targetSdkVersion;
 
     @Override
@@ -121,10 +112,52 @@ public class ProductsActivity extends AppCompatActivity implements BeaconConsume
             }
         });
 
-
         // Permissions and bluetooth
         verifyBluetooth();
         checkAndRequestPermissions();
+
+        beaconManager = new BeaconManager(this);
+        beaconManager.setRangingListener(new BeaconManager.RangingListener() {
+            @Override
+            public void onBeaconsDiscovered(Region region, List<Beacon> list) {
+                if (!list.isEmpty()) {
+                    Log.d(TAG, "Nombres d'estimote captés: " + list.size());
+                    for(Beacon beac : list){
+                        Log.d(TAG, "Estimote mac : " + beac.getMacAddress());
+                        Log.d(TAG, "Estimote power : " + beac.getMeasuredPower());
+                    }
+
+
+                }
+            }
+        });
+
+        region = new Region("ranged region", UUID.fromString("d0d3fa86-ca76-45ec-9bd9-6af42f6319af"), 26444, 4461);
+        Log.i(TAG, "CIYYYYYYYYYYYYYYYYYYYYYYYYYC : "  + region.getProximityUUID());
+
+
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        SystemRequirementsChecker.checkWithDefaultDialogs(this);
+
+        beaconManager.connect(new BeaconManager.ServiceReadyCallback() {
+            @Override
+            public void onServiceReady() {
+                beaconManager.startRanging(region);
+            }
+        });
+    }
+
+    @Override
+    protected void onPause() {
+        beaconManager.stopRanging(region);
+
+        super.onPause();
     }
 
 
@@ -176,45 +209,7 @@ public class ProductsActivity extends AppCompatActivity implements BeaconConsume
         return result;
     }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        mBeaconManager.unbind(this);
-    }
 
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        mBeaconManager = BeaconManager.getInstanceForApplication(this.getApplicationContext());
-
-        // Detect the URL frame:
-        mBeaconManager.getBeaconParsers().add(new BeaconParser().
-                setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"));
-        mBeaconManager.bind(this);
-    }
-
-    public void onBeaconServiceConnect() {
-        Region region = new Region("all-beacons-region", null, null, null);
-        try {
-            mBeaconManager.startRangingBeaconsInRegion(region);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
-        mBeaconManager.addRangeNotifier(this);
-    }
-
-    @Override
-    public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
-        for (Beacon beacon: beacons) {
-            if (beacon.getServiceUuid() == 0xfeaa && beacon.getBeaconTypeCode() == 0x10) {
-                // This is a Eddystone-URL frame
-                String url = UrlBeaconUrlCompressor.uncompress(beacon.getId1().toByteArray());
-                Log.d(TAG, "I see a beacon transmitting a url: " + url +
-                        " approximately " + beacon.getDistance() + " meters away.");
-            }
-        }
-    }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -302,10 +297,10 @@ public class ProductsActivity extends AppCompatActivity implements BeaconConsume
             boolean bluetoothError = false;
 
             if (android.os.Build.VERSION.SDK_INT < 18) {
-                throw new BleNotAvailableException("Bluetooth LE not supported by this device");
+                throw new RuntimeException("Bluetooth LE not supported by this device");
             }
             if (!getApplicationContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
-                throw new BleNotAvailableException("Bluetooth LE not supported by this device");
+                throw new RuntimeException("Bluetooth LE not supported by this device");
             } else {
                 if (!((BluetoothManager) getApplicationContext().getSystemService(Context.BLUETOOTH_SERVICE)).getAdapter().isEnabled()) {
                     bluetoothError = true;

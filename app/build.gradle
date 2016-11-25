@@ -103,7 +103,7 @@ dependencies {
 
 
     //Beacon
-    compile "org.altbeacon:android-beacon-library:$rootProject.ext.beaconVersion"
+    compile 'com.estimote:sdk:0.13.0@aar'
 
     // butterknife
     compile 'com.jakewharton:butterknife:8.4.0'
