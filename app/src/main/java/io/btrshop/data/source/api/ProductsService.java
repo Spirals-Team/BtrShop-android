@@ -5,6 +5,7 @@ import io.btrshop.detailsproduct.domain.model.Product;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
+import rx.Observable;
 
 /**
  * Created by charlie on 28/10/16.
@@ -12,7 +13,7 @@ import retrofit2.http.Path;
  * Interface : all the apis for the products.
  *
  */
-public interface ProductsApiRestInterface {
+public interface ProductsService {
 
     /**
      *  Function that retrieve the call for the product with EAN.
@@ -21,7 +22,7 @@ public interface ProductsApiRestInterface {
      * @return the product
      */
     @GET("products/{ean}")
-    Call<Product> getProduct(@Path("ean")
+    Observable<Product> getProduct(@Path("ean")
                              String ean);
 
 }

@@ -1,12 +1,15 @@
 package io.btrshop.products;
 
-import android.support.annotation.NonNull;
-import android.util.Log;
+import javax.inject.Inject;
 
-import io.btrshop.UseCase;
-import io.btrshop.UseCaseHandler;
+import io.btrshop.data.source.api.ProductsService;
 import io.btrshop.detailsproduct.domain.model.Product;
-import io.btrshop.products.domain.usecase.GetProduct;
+
+import retrofit2.Retrofit;
+import rx.Observer;
+import rx.*;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -15,18 +18,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class ProductsPresenter implements ProductsContract.Presenter {
 
-    private ProductsContract.View mProductsView;
-    private GetProduct mGetProduct;
-    private UseCaseHandler mUseCaseHandler;
 
-    public ProductsPresenter(@NonNull UseCaseHandler useCaseHandler,
-                             @NonNull ProductsContract.View articlesView, @NonNull GetProduct getProduct) {
-        mUseCaseHandler = checkNotNull(useCaseHandler, "usecaseHandler cannot be null");
-        mProductsView = checkNotNull(articlesView, "productsView cannot be null!");
-        mGetProduct = checkNotNull(getProduct, "getProduct cannot be null");
-        mProductsView.setPresenter(this);
+    ProductsContract.View mProductsView;
+    public Retrofit retrofit;
 
-
+    @Inject
+    public ProductsPresenter(Retrofit retrofit, ProductsContract.View mView) {
+        this.retrofit = retrofit;
+        this.mProductsView = mView;
     }
 
     @Override
@@ -36,27 +35,31 @@ public class ProductsPresenter implements ProductsContract.Presenter {
 
     @Override
     public void getProduct(String ean) {
-        Log.d("PROD_PRES", "Get product : " + ean);
 
         checkNotNull(ean, "ean cannot be null!");
-        mUseCaseHandler.execute(mGetProduct, new GetProduct.RequestValues(ean),
-                new UseCase.UseCaseCallback<GetProduct.ResponseValue>() {
+        retrofit.create(ProductsService.class).getProduct(ean)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .unsubscribeOn(Schedulers.io())
+                .subscribe(new Observer<Product>() {
 
                     @Override
-                    public void onSuccess(GetProduct.ResponseValue response) {
-                        Product produitResponse = response.getProduct();
-                        Log.d("PROD_PRES", "success");
-                        if(produitResponse != null)
-                            mProductsView.showProduct(response.getProduct());
-                        else
-                            mProductsView.showError();
+                    public void onCompleted() {
+
                     }
 
                     @Override
-                    public void onError() {
-                        Log.d("EAN", "ERROR");
+                    public void onError(Throwable e) {
+                        mProductsView.showError();
                     }
+
+                    @Override
+                    public void onNext(Product product) {
+                        mProductsView.showProduct(product);
+                    }
+
                 });
+
     }
 
     @Override
