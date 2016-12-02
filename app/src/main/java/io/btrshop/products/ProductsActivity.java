@@ -31,6 +31,7 @@ import com.estimote.sdk.Beacon;
 import com.estimote.sdk.BeaconManager;
 import com.estimote.sdk.Region;
 import com.estimote.sdk.SystemRequirementsChecker;
+import com.estimote.sdk.eddystone.Eddystone;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,6 +56,10 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
     private final static int REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS = 124;
     private final static int REQUEST_PERMISSION_PHONE_STATE = 1;
     protected final static String TAG = "ProductsFragment";
+
+    private final double COEFF1 = 0.42093;
+    private final double COEFF2 = 6.9476;
+    private final double COEFF3 = 0.54992;
 
     // UI
     @Inject ProductsPresenter mProductsPresenter;
@@ -117,6 +122,12 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
         checkAndRequestPermissions();
 
         beaconManager = new BeaconManager(this);
+        beaconManager.setEddystoneListener(new BeaconManager.EddystoneListener() {
+            @Override
+            public void onEddystonesFound(List<Eddystone> list) {
+
+            }
+        });
         beaconManager.setRangingListener(new BeaconManager.RangingListener() {
             @Override
             public void onBeaconsDiscovered(Region region, List<Beacon> list) {
@@ -125,17 +136,33 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
                     for(Beacon beac : list){
                         Log.d(TAG, "Estimote mac : " + beac.getMacAddress());
                         Log.d(TAG, "Estimote power : " + beac.getMeasuredPower());
+                        Log.d(TAG, "Estimote distance : " + calculateDistance(beac.getMeasuredPower(), beac.getRssi()));
+
                     }
-
-
                 }
             }
         });
 
-        region = new Region("ranged region", UUID.fromString("d0d3fa86-ca76-45ec-9bd9-6af42f6319af"), 26444, 4461);
+        region = new Region("ranged region", null, null, null);
         Log.i(TAG, "CIYYYYYYYYYYYYYYYYYYYYYYYYYC : "  + region.getProximityUUID());
 
 
+    }
+
+    public double calculateDistance(int txPower, double rssi) {
+        if (rssi == 0) {
+            return -1.0; // if we cannot determine accuracy, return -1.
+        }
+
+        double ratio = rssi*1.0/txPower;
+        double distance;
+        if (ratio < 1.0) {
+            distance =  Math.pow(ratio,10);
+        }
+        else {
+            distance =  (COEFF1)*Math.pow(ratio,COEFF2) + COEFF3;
+        }
+        return distance;
     }
 
 
