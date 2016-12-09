@@ -45,6 +45,7 @@ import io.btrshop.BtrShopApplication;
 import io.btrshop.R;
 import io.btrshop.detailsproduct.DetailsProductActivity;
 import io.btrshop.detailsproduct.domain.model.Product;
+import io.btrshop.products.domain.model.BeaconObject;
 import io.btrshop.scanner.ScannerActivity;
 import io.btrshop.util.EspressoIdlingResource;
 
@@ -57,20 +58,14 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
     private final static int REQUEST_PERMISSION_PHONE_STATE = 1;
     protected final static String TAG = "ProductsFragment";
 
-    private final double COEFF1 = 0.42093;
-    private final double COEFF2 = 6.9476;
-    private final double COEFF3 = 0.54992;
+    ProductsBeacon beacons;
 
     // UI
     @Inject ProductsPresenter mProductsPresenter;
     @BindView(R.id.drawer_layout)DrawerLayout mDrawerLayout;
     @BindView(R.id.fab_scan_article) FloatingActionButton fab;
-    //@BindView(R.id.products_test)TextView productTestET;
     static MaterialDialog dialog;
 
-    // Components
-    private BeaconManager beaconManager;
-    private Region region;
     private int targetSdkVersion;
 
     @Override
@@ -121,69 +116,21 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
         verifyBluetooth();
         checkAndRequestPermissions();
 
-        beaconManager = new BeaconManager(this);
-        beaconManager.setEddystoneListener(new BeaconManager.EddystoneListener() {
-            @Override
-            public void onEddystonesFound(List<Eddystone> list) {
-
-            }
-        });
-        beaconManager.setRangingListener(new BeaconManager.RangingListener() {
-            @Override
-            public void onBeaconsDiscovered(Region region, List<Beacon> list) {
-                if (!list.isEmpty()) {
-                    Log.d(TAG, "Nombres d'estimote captés: " + list.size());
-                    for(Beacon beac : list){
-                        Log.d(TAG, "Estimote mac : " + beac.getMacAddress());
-                        Log.d(TAG, "Estimote power : " + beac.getMeasuredPower());
-                        Log.d(TAG, "Estimote distance : " + calculateDistance(beac.getMeasuredPower(), beac.getRssi()));
-
-                    }
-                }
-            }
-        });
-
-        region = new Region("ranged region", null, null, null);
-        Log.i(TAG, "CIYYYYYYYYYYYYYYYYYYYYYYYYYC : "  + region.getProximityUUID());
-
-
+        beacons = new ProductsBeacon(this);
+        beacons.scanBeacon();
     }
-
-    public double calculateDistance(int txPower, double rssi) {
-        if (rssi == 0) {
-            return -1.0; // if we cannot determine accuracy, return -1.
-        }
-
-        double ratio = rssi*1.0/txPower;
-        double distance;
-        if (ratio < 1.0) {
-            distance =  Math.pow(ratio,10);
-        }
-        else {
-            distance =  (COEFF1)*Math.pow(ratio,COEFF2) + COEFF3;
-        }
-        return distance;
-    }
-
 
     @Override
     protected void onResume() {
         super.onResume();
 
         SystemRequirementsChecker.checkWithDefaultDialogs(this);
-
-        beaconManager.connect(new BeaconManager.ServiceReadyCallback() {
-            @Override
-            public void onServiceReady() {
-                beaconManager.startRanging(region);
-            }
-        });
+        beacons.connect();
     }
 
     @Override
     protected void onPause() {
-        beaconManager.stopRanging(region);
-
+        beacons.stop();
         super.onPause();
     }
 
@@ -289,7 +236,7 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
                         .content("Veuillez patientez ...")
                         .progress(true, 0)
                         .show();
-                mProductsPresenter.getProduct(result);
+                mProductsPresenter.getProduct(result, beacons.getListBeacons());
             }
         }
     }

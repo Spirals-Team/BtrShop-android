@@ -1,13 +1,16 @@
 package io.btrshop.products;
 
+import java.util.List;
+
 import javax.inject.Inject;
 
 import io.btrshop.data.source.api.ProductsService;
 import io.btrshop.detailsproduct.domain.model.Product;
 
+import io.btrshop.products.domain.model.BeaconObject;
+import io.btrshop.products.domain.model.Position;
 import retrofit2.Retrofit;
 import rx.Observer;
-import rx.*;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
@@ -29,24 +32,29 @@ public class ProductsPresenter implements ProductsContract.Presenter {
     }
 
     @Override
+
     public void scanProduct() {
         mProductsView.showScan();
     }
 
     @Override
-    public void getProduct(String ean) {
+    public void getProduct(String ean, List<BeaconObject> listBeacon) {
 
         checkNotNull(ean, "ean cannot be null!");
-        retrofit.create(ProductsService.class).getProduct(ean)
+        checkNotNull(listBeacon, "listBeacon cannot be null!");
+
+        // Triangulation avec la listBeacon
+
+        Position p =  new Position(listBeacon);
+
+        retrofit.create(ProductsService.class).postProduct(ean, p)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .unsubscribeOn(Schedulers.io())
                 .subscribe(new Observer<Product>() {
 
                     @Override
-                    public void onCompleted() {
-
-                    }
+                    public void onCompleted() {}
 
                     @Override
                     public void onError(Throwable e) {
@@ -59,7 +67,6 @@ public class ProductsPresenter implements ProductsContract.Presenter {
                     }
 
                 });
-
     }
 
     @Override
