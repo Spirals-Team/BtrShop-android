@@ -138,7 +138,10 @@ dependencies {
     androidTestCompile "com.android.support:design:$rootProject.supportLibraryVersion"
     androidTestCompile "com.google.dexmaker:dexmaker:1.2"
     androidTestCompile "com.google.dexmaker:dexmaker-mockito:1.2"
-    compile 'com.google.android.gms:play-services-appindexing:8.4.0'
+
+
+    //trilateration
+    compile 'com.lemmingapex.trilateration:trilateration:1.0.1'
 }
 // Need to
 android.applicationVariants.all { variant ->

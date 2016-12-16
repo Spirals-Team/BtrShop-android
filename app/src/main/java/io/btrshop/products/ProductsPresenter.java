@@ -13,12 +13,14 @@ import io.btrshop.detailsproduct.domain.model.Product;
 
 import io.btrshop.products.domain.model.BeaconObject;
 import io.btrshop.products.domain.model.Position;
+import io.btrshop.util.ActivityUtils;
 import retrofit2.Retrofit;
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static io.btrshop.util.ActivityUtils.calculPosition;
 
 /**
  * Created by charlie on 20/10/16.
@@ -49,7 +51,7 @@ public class ProductsPresenter implements ProductsContract.Presenter {
 
         // Triangulation avec la listBeacon
 
-        Position p =  new Position(8, 7);
+        Position p = calculPosition(listBeacon);
 
         retrofit.create(ProductsService.class).postProduct(ean, p)
                 .subscribeOn(Schedulers.io())
