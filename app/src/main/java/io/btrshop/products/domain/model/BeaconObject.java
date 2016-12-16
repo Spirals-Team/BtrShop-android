@@ -7,10 +7,12 @@ package io.btrshop.products.domain.model;
 public class BeaconObject {
     private double distance;
     private String UUID;
+    private Position position;
 
-    public BeaconObject(double distance, String UUID) {
+    public BeaconObject(double distance, String UUID, Position position) {
         this.distance = distance;
         this.UUID = UUID;
+        this.position = position;
     }
 
 
@@ -28,5 +30,13 @@ public class BeaconObject {
 
     public void setUUID(String UUID) {
         this.UUID = UUID;
+    }
+
+    public Position getPosition() {
+        return position;
+    }
+
+    public void setPosition(Position position) {
+        this.position = position;
     }
 }

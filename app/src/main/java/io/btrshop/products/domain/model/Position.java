@@ -11,10 +11,6 @@ public class Position {
     private double x;
     private double y;
 
-    public Position (List<BeaconObject> listObject){
-        triangulation(listObject);
-    }
-
     public Position(double x, double y) {
         this.x = x;
         this.y = y;
@@ -35,13 +31,5 @@ public class Position {
     public void setY(double y) {
         this.y = y;
     }
-
-    // TODO : triangulation
-    private void triangulation(List<BeaconObject> listObject) {
-
-        this.x = 7;
-        this.y = 8;
-    }
-
 
 }

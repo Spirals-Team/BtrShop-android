@@ -21,6 +21,18 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 
+import com.lemmingapex.trilateration.NonLinearLeastSquaresSolver;
+import com.lemmingapex.trilateration.TrilaterationFunction;
+
+import org.apache.commons.math3.fitting.leastsquares.LeastSquaresOptimizer;
+import org.apache.commons.math3.fitting.leastsquares.LevenbergMarquardtOptimizer;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import io.btrshop.products.domain.model.BeaconObject;
+import io.btrshop.products.domain.model.Position;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -40,6 +52,46 @@ public class ActivityUtils {
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.add(frameId, fragment);
         transaction.commit();
+    }
+
+    public static Position calculPosition(List<BeaconObject> listBeacon){
+
+        /*
+        List<List<Double>> positions = new ArrayList<>();
+        List<Double> distances = new ArrayList<>();
+
+
+        for (BeaconObject b: listBeacon) {
+            List<Double> pos = new ArrayList<>();
+            pos.add(b.getPosition().getX());
+            pos.add(b.getPosition().getY());
+            positions.add(pos);
+            distances.add(b.getDistance());
+        }
+
+
+        double[] distances_primi = new double[distances.size()];
+        for (int i = 0; i < distances_primi.length; i++) {
+            distances_primi[i] = distances.get(i);
+        }
+
+        double[][] position_primi = new double[positions.size()][2];
+        for (int i = 0; i < position_primi.length; i++) {
+            position_primi[i][0] = positions.get(i).get(0);
+            position_primi[i][1] = positions.get(i).get(1);
+        }
+        */
+
+        double[][] positions = new double[][] { { 5.0, -6.0 }, { 13.0, -15.0 }, { 21.0, -3.0 }, { 12.4, -21.2 } };
+        double[] distances = new double[] { 8.06, 13.97, 23.32, 15.31 };
+
+        NonLinearLeastSquaresSolver solver = new NonLinearLeastSquaresSolver(new TrilaterationFunction(positions, distances), new LevenbergMarquardtOptimizer());
+        LeastSquaresOptimizer.Optimum optimum = solver.solve();
+
+        // the answer
+        double[] centroid = optimum.getPoint().toArray();
+        return null;
+
     }
 
 }
