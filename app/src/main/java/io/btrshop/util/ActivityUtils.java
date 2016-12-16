@@ -63,8 +63,8 @@ public class ActivityUtils {
 
         for (BeaconObject b: listBeacon) {
             List<Double> pos = new ArrayList<>();
-            pos.add(b.getPosition().getX());
-            pos.add(b.getPosition().getY());
+            pos.add(b.getPosition().getLat());
+            pos.add(b.getPosition().getLng());
             positions.add(pos);
             distances.add(b.getDistance());
         }

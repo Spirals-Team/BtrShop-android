@@ -8,8 +8,7 @@ public class BeaconObject {
 
     private double distance;
     private String UUID;
-    private String lat;
-    private String lng;
+    private Position position;
 
 
     public BeaconObject(double distance, String UUID) {
@@ -32,5 +31,13 @@ public class BeaconObject {
 
     public void setUUID(String UUID) {
         this.UUID = UUID;
+    }
+
+    public Position getPosition() {
+        return position;
+    }
+
+    public void setPosition(Position position) {
+        this.position = position;
     }
 }
