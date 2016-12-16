@@ -56,31 +56,18 @@ public class ActivityUtils {
 
     public static Position calculPosition(List<BeaconObject> listBeacon){
 
-        /*
-        List<List<Double>> positions = new ArrayList<>();
-        List<Double> distances = new ArrayList<>();
 
 
-        for (BeaconObject b: listBeacon) {
-            List<Double> pos = new ArrayList<>();
-            pos.add(b.getPosition().getLat());
-            pos.add(b.getPosition().getLng());
-            positions.add(pos);
-            distances.add(b.getDistance());
-        }
-
-
-        double[] distances_primi = new double[distances.size()];
+        double[] distances_primi = new double[listBeacon.size()];
         for (int i = 0; i < distances_primi.length; i++) {
-            distances_primi[i] = distances.get(i);
+            distances_primi[i] = listBeacon.get(i).getDistance();
         }
 
-        double[][] position_primi = new double[positions.size()][2];
+        double[][] position_primi = new double[listBeacon.size()][2];
         for (int i = 0; i < position_primi.length; i++) {
-            position_primi[i][0] = positions.get(i).get(0);
-            position_primi[i][1] = positions.get(i).get(1);
+            position_primi[i][0] = listBeacon.get(i).getPosition().getLat();
+            position_primi[i][1] = listBeacon.get(i).getPosition().getLng();
         }
-        */
 
         double[][] positions = new double[][] { { 5.0, -6.0 }, { 13.0, -15.0 }, { 21.0, -3.0 }, { 12.4, -21.2 } };
         double[] distances = new double[] { 8.06, 13.97, 23.32, 15.31 };
