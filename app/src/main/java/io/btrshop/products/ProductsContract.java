@@ -22,13 +22,16 @@ public interface ProductsContract {
 
         void showError();
 
+        void setBeaconsList(Map<String, BeaconObject> beaconObjects);
     }
 
     interface Presenter extends BasePresenter {
 
         void scanProduct();
 
-        void getProduct(String ean, List<BeaconObject> listBeacon);
+        void postProduct(String ean, List<BeaconObject> listBeacon);
+
+        void getBeacons();
 
     }
 }

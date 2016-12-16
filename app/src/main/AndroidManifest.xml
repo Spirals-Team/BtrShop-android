@@ -41,7 +41,11 @@
         <activity android:name="io.btrshop.scanner.ScannerActivity" />
         <activity android:name=".detailsproduct.DetailsProductActivity"
             android:label="@string/title_activity_details_product"
-            android:theme="@style/AppTheme"/>
+            android:theme="@style/AppTheme"/><!-- ATTENTION: This was auto-generated to add Google Play services to your project for
+     App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information. -->
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
 
     </application>
 

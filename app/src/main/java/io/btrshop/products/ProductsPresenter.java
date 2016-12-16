@@ -1,6 +1,10 @@
 package io.btrshop.products;
 
+import com.estimote.sdk.Beacon;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -38,14 +42,14 @@ public class ProductsPresenter implements ProductsContract.Presenter {
     }
 
     @Override
-    public void getProduct(String ean, List<BeaconObject> listBeacon) {
+    public void postProduct(String ean, List<BeaconObject> listBeacon) {
 
         checkNotNull(ean, "ean cannot be null!");
         checkNotNull(listBeacon, "listBeacon cannot be null!");
 
         // Triangulation avec la listBeacon
 
-        Position p =  new Position(listBeacon);
+        Position p =  new Position(8, 7);
 
         retrofit.create(ProductsService.class).postProduct(ean, p)
                 .subscribeOn(Schedulers.io())
@@ -67,6 +71,35 @@ public class ProductsPresenter implements ProductsContract.Presenter {
                     }
 
                 });
+    }
+
+    @Override
+    public void getBeacons() {
+
+        retrofit.create(ProductsService.class).getBeacons().subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .unsubscribeOn(Schedulers.io())
+                .subscribe(new Observer<List<BeaconObject>>() {
+
+
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(List<BeaconObject> beaconObjects) {
+                        Map<String, BeaconObject> map = new HashMap<String, BeaconObject>();
+                        for (BeaconObject i : beaconObjects) map.put(i.getUUID() ,i);
+                        mProductsView.setBeaconsList(map);
+                    }
+                });
+
     }
 
     @Override

@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -27,15 +28,15 @@ import android.view.View;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.estimote.sdk.Beacon;
-import com.estimote.sdk.BeaconManager;
-import com.estimote.sdk.Region;
 import com.estimote.sdk.SystemRequirementsChecker;
-import com.estimote.sdk.eddystone.Eddystone;
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.appindexing.Thing;
+import com.google.android.gms.common.api.GoogleApiClient;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -50,7 +51,6 @@ import io.btrshop.scanner.ScannerActivity;
 import io.btrshop.util.EspressoIdlingResource;
 
 
-
 public class ProductsActivity extends AppCompatActivity implements ProductsContract.View {
 
     // Constantes
@@ -59,11 +59,15 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
     protected final static String TAG = "ProductsFragment";
 
     ProductsBeacon beacons;
+    Map<String, BeaconObject> listBeacons;
 
     // UI
-    @Inject ProductsPresenter mProductsPresenter;
-    @BindView(R.id.drawer_layout)DrawerLayout mDrawerLayout;
-    @BindView(R.id.fab_scan_article) FloatingActionButton fab;
+    @Inject
+    ProductsPresenter mProductsPresenter;
+    @BindView(R.id.drawer_layout)
+    DrawerLayout mDrawerLayout;
+    @BindView(R.id.fab_scan_article)
+    FloatingActionButton fab;
     static MaterialDialog dialog;
 
     private int targetSdkVersion;
@@ -116,8 +120,11 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
         verifyBluetooth();
         checkAndRequestPermissions();
 
+        mProductsPresenter.getBeacons();
+
         beacons = new ProductsBeacon(this);
         beacons.scanBeacon();
+
     }
 
     @Override
@@ -135,16 +142,15 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
     }
 
 
-
     private void checkAndRequestPermissions() {
         /* Checking for permissions */
         List<String> permissionsNeeded = new ArrayList<>();
         final List<String> permissionsList = new ArrayList<>();
-        if (!selfPermissionGranted(Manifest.permission.CAMERA)){
+        if (!selfPermissionGranted(Manifest.permission.CAMERA)) {
             permissionsNeeded.add("Camera");
             permissionsList.add(Manifest.permission.CAMERA);
         }
-        if (!selfPermissionGranted(Manifest.permission.ACCESS_COARSE_LOCATION)){
+        if (!selfPermissionGranted(Manifest.permission.ACCESS_COARSE_LOCATION)) {
             permissionsNeeded.add("Access Location");
             permissionsList.add(Manifest.permission.ACCESS_COARSE_LOCATION);
         }
@@ -153,13 +159,12 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
         if (permissionsList.size() > 0) {
             if (permissionsNeeded.size() > 0) {
                 // Need Rationale
-                requestPermissions(permissionsList.toArray(new String[permissionsList.size()]),REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS);
+                requestPermissions(permissionsList.toArray(new String[permissionsList.size()]), REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS);
             }
             requestPermissions(permissionsList.toArray(new String[permissionsList.size()]),
                     REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS);
         }
     }
-
 
 
     public boolean selfPermissionGranted(String permission) {
@@ -182,7 +187,6 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
 
         return result;
     }
-
 
 
     @Override
@@ -228,7 +232,7 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == 1) {
-            if(resultCode == Activity.RESULT_OK){
+            if (resultCode == Activity.RESULT_OK) {
                 String result = data.getStringExtra("result");
                 Log.d("SCAN", result);
                 dialog = new MaterialDialog.Builder(this)
@@ -236,7 +240,7 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
                         .content("Veuillez patientez ...")
                         .progress(true, 0)
                         .show();
-                mProductsPresenter.getProduct(result, beacons.getListBeacons());
+                mProductsPresenter.postProduct(result, beacons.getListBeacons(listBeacons));
             }
         }
     }
@@ -248,7 +252,7 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
     }
 
     @Override
-    public void showProduct(final Product product){
+    public void showProduct(final Product product) {
         dialog.dismiss();
         Intent detailProductIntent = new Intent(this, DetailsProductActivity.class);
         detailProductIntent.putExtra("product", product);
@@ -266,11 +270,16 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
                 .show();
     }
 
+    @Override
+    public void setBeaconsList(Map<String, BeaconObject> beaconObjects) {
+        this.listBeacons = beaconObjects;
+    }
+
     private void verifyBluetooth() {
         try {
             boolean bluetoothError = false;
 
-            if (android.os.Build.VERSION.SDK_INT < 18) {
+            if (Build.VERSION.SDK_INT < 18) {
                 throw new RuntimeException("Bluetooth LE not supported by this device");
             }
             if (!getApplicationContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
@@ -280,7 +289,7 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
                     bluetoothError = true;
                 }
             }
-            if(bluetoothError){
+            if (bluetoothError) {
                 dialog = new MaterialDialog.Builder(ProductsActivity.this)
                         .title("Bluetooth not enabled")
                         .content("Please enable bluetooth in settings and restart this application.")
@@ -294,8 +303,7 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
                         })
                         .show();
             }
-        }
-        catch (RuntimeException e) {
+        } catch (RuntimeException e) {
             dialog = new MaterialDialog.Builder(ProductsActivity.this)
                     .title("Bluetooth LE not available")
                     .content("Sorry, this device does not support Bluetooth LE.")
@@ -311,4 +319,5 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
         }
 
     }
+
 }

@@ -11,6 +11,7 @@ import com.estimote.sdk.eddystone.Eddystone;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 
 import io.btrshop.products.domain.model.BeaconObject;
 
@@ -101,10 +102,16 @@ public class ProductsBeacon {
         beaconManager.stopRanging(region);
     }
 
-    public List<BeaconObject> getListBeacons(){
-        if(listBeacons.isEmpty() || listBeacons == null)
+    public List<BeaconObject> getListBeacons(Map<String, BeaconObject> mapBeacons){
+        if(this.listBeacons.isEmpty() || this.listBeacons == null)
             this.scanBeacon();
-        return listBeacons;
+        for (BeaconObject b : this.listBeacons ){
+            double distance = b.getDistance();
+            b = mapBeacons.get(b.getUUID());
+            b.setDistance(distance);
+        }
+
+        return this.listBeacons;
     }
 
 }

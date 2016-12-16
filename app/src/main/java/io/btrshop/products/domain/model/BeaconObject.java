@@ -5,8 +5,12 @@ package io.btrshop.products.domain.model;
  */
 
 public class BeaconObject {
+
     private double distance;
     private String UUID;
+    private String lat;
+    private String lng;
+
 
     public BeaconObject(double distance, String UUID) {
         this.distance = distance;
