@@ -26,7 +26,7 @@ public class BtrShopApplication extends Application {
         mContext = this;
         mApiComponent = DaggerApiComponent.builder()
                 .applicationModule(new ApplicationModule(this))
-                .apiModule(new ApiModule(mContext.getResources().getString(R.string.base_url_test)))
+                .apiModule(new ApiModule(mContext.getResources().getString(R.string.base_url_api)))
                 .build();
 
         // TODO: put your App ID and App Token here
