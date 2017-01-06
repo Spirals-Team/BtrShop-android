@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
+import io.btrshop.products.domain.model.BeaconData;
 import io.btrshop.products.domain.model.BeaconObject;
 
 /**
@@ -60,7 +61,7 @@ public class ProductsBeacon {
                         Log.d(TAG, "Estimote distance : " + calculateDistance(beac.getMeasuredPower(), beac.getRssi()));
                         listBeacons.add(new BeaconObject(
                                         calculateDistance(beac.getMeasuredPower(), beac.getRssi()),
-                                        beac.getProximityUUID().toString()
+                                        new BeaconData(beac.getProximityUUID().toString())
                                         ));
                     }
                 }
@@ -68,7 +69,7 @@ public class ProductsBeacon {
         });
 
         region = new Region("ranged region", null, null, null);
-        Log.i(TAG, "CIYYYYYYYYYYYYYYYYYYYYYYYYYC : "  + region.getProximityUUID());
+        Log.i(TAG, "REGION : "  + region.getProximityUUID());
 
     }
 
@@ -103,15 +104,30 @@ public class ProductsBeacon {
     }
 
     public List<BeaconObject> getListBeacons(Map<String, BeaconObject> mapBeacons){
+        Log.d("MAP", ""+mapBeacons.size());
+        Log.d("LIST", ""+this.listBeacons.size());
+
+        List<BeaconObject> returnList = new ArrayList<>();
+
         if(this.listBeacons.isEmpty() || this.listBeacons == null)
             this.scanBeacon();
+
+        int nbBeaconCorrect = 0;
         for (BeaconObject b : this.listBeacons ){
             double distance = b.getDistance();
-            b = mapBeacons.get(b.getUUID());
-            b.setDistance(distance);
+            Log.d("BEACON", b.getData().getUuid());
+            BeaconObject beacon = mapBeacons.get(b.getData().getUuid().toUpperCase());
+            if(beacon != null) {
+                Log.d("DISTANCE", distance+ "m");
+                nbBeaconCorrect++;
+                beacon.setDistance(distance);
+                returnList.add(beacon);
+            }
         }
-
-        return this.listBeacons;
+        Log.d("NBBEACONCORRECT", "il y a : " + nbBeaconCorrect + " beacons captés corrects");
+        if(nbBeaconCorrect < 2)
+            return null;
+        return returnList;
     }
 
 }

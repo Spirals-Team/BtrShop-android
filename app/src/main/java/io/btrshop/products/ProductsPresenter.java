@@ -1,6 +1,6 @@
 package io.btrshop.products;
 
-import com.estimote.sdk.Beacon;
+import android.util.Log;
 
 import java.util.HashMap;
 import java.util.List;
@@ -13,7 +13,6 @@ import io.btrshop.detailsproduct.domain.model.Product;
 
 import io.btrshop.products.domain.model.BeaconObject;
 import io.btrshop.products.domain.model.Position;
-import io.btrshop.util.ActivityUtils;
 import retrofit2.Retrofit;
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
@@ -47,38 +46,66 @@ public class ProductsPresenter implements ProductsContract.Presenter {
     public void postProduct(String ean, List<BeaconObject> listBeacon) {
 
         checkNotNull(ean, "ean cannot be null!");
-        checkNotNull(listBeacon, "listBeacon cannot be null!");
 
-        // Triangulation avec la listBeacon
 
-        Position p = calculPosition(listBeacon);
+        if(listBeacon == null || !listBeacon.isEmpty()) {
 
-        retrofit.create(ProductsService.class).postProduct(ean, p)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .unsubscribeOn(Schedulers.io())
-                .subscribe(new Observer<Product>() {
+            // Triangulation avec la listBeacon
+            Position p = calculPosition(listBeacon);
+            Log.d("POSITION", "lat : " + p.getLat() +" / long : " + p.getLng());
 
-                    @Override
-                    public void onCompleted() {}
+            retrofit.create(ProductsService.class).postProduct(ean, p)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribe(new Observer<Product>() {
 
-                    @Override
-                    public void onError(Throwable e) {
-                        mProductsView.showError();
-                    }
+                        @Override
+                        public void onCompleted() {
+                        }
 
-                    @Override
-                    public void onNext(Product product) {
-                        mProductsView.showProduct(product);
-                    }
+                        @Override
+                        public void onError(Throwable e) {
+                            mProductsView.showError(e.getMessage());
+                        }
 
-                });
+                        @Override
+                        public void onNext(Product product) {
+                            mProductsView.showProduct(product);
+                        }
+
+                    });
+        }else{
+            retrofit.create(ProductsService.class).getProduct(ean)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribe(new Observer<Product>() {
+
+                        @Override
+                        public void onCompleted() {
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            Log.d("ERROR", e.getMessage());
+                            mProductsView.showError(e.getMessage());
+                        }
+
+                        @Override
+                        public void onNext(Product product) {
+                            mProductsView.showProduct(product);
+                        }
+
+                    });
+        }
     }
 
     @Override
     public void getBeacons() {
 
-        retrofit.create(ProductsService.class).getBeacons().subscribeOn(Schedulers.io())
+        retrofit.create(ProductsService.class).getBeacons()
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .unsubscribeOn(Schedulers.io())
                 .subscribe(new Observer<List<BeaconObject>>() {
@@ -86,18 +113,21 @@ public class ProductsPresenter implements ProductsContract.Presenter {
 
                     @Override
                     public void onCompleted() {
-
+                        Log.d("SUCCESS", "success get beacons");
                     }
 
                     @Override
                     public void onError(Throwable e) {
-
+                        Log.d("ERROR", "fail get beacons"  + e.getMessage());
                     }
 
                     @Override
                     public void onNext(List<BeaconObject> beaconObjects) {
+                        Log.d("NEXT", beaconObjects.size()+"");
                         Map<String, BeaconObject> map = new HashMap<String, BeaconObject>();
-                        for (BeaconObject i : beaconObjects) map.put(i.getUUID() ,i);
+                        for (BeaconObject i : beaconObjects)
+                            map.put(i.getData().getUuid() ,i);
+
                         mProductsView.setBeaconsList(map);
                     }
                 });

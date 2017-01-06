@@ -115,6 +115,7 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
         verifyBluetooth();
         checkAndRequestPermissions();
 
+        Log.d("PRODACT", "GET BEACONS");
         mProductsPresenter.getBeacons();
 
         beacons = new ProductsBeacon(this);
@@ -255,12 +256,12 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
     }
 
     @Override
-    public void showError() {
+    public void showError(String message) {
 
         dialog.dismiss();
         new MaterialDialog.Builder(this)
-                .title("No Product !")
-                .content("There is no product with this ean ! ")
+                .title("Error !")
+                .content(message)
                 .positiveText("Ok")
                 .show();
     }

@@ -20,7 +20,7 @@ public interface ProductsContract {
 
         void showProduct(Product product);
 
-        void showError();
+        void showError(String message);
 
         void setBeaconsList(Map<String, BeaconObject> beaconObjects);
     }

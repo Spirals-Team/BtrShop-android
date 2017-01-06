@@ -30,6 +30,9 @@ public interface ProductsService {
     Observable<Product> postProduct(@Path("ean") String ean,
                                     @Body Position position);
 
+    @GET("products/{ean}")
+    Observable<Product> getProduct(@Path("ean") String ean);
+
     @GET("beacons/")
     Observable<List<BeaconObject>> getBeacons();
 
