@@ -3,8 +3,7 @@ package io.btrshop.data.source.api;
 import java.util.List;
 
 import io.btrshop.detailsproduct.domain.model.Product;
-import io.btrshop.products.domain.model.BeaconObject;
-import io.btrshop.products.domain.model.Position;
+import io.btrshop.products.domain.model.BeaconJson;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
@@ -28,14 +27,9 @@ public interface ProductsService {
      */
     @POST("products/{ean}")
     Observable<Product> postProduct(@Path("ean") String ean,
-                                    @Body Position position);
+                                    @Body List<BeaconJson> position);
 
     @GET("products/{ean}")
     Observable<Product> getProduct(@Path("ean") String ean);
-
-    @GET("beacons/")
-    Observable<List<BeaconObject>> getBeacons();
-
-
 
 }

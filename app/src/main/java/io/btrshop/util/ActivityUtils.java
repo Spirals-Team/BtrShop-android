@@ -22,16 +22,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 
 
-import org.apache.commons.math3.fitting.leastsquares.LeastSquaresOptimizer;
-import org.apache.commons.math3.fitting.leastsquares.LevenbergMarquardtOptimizer;
-
-import java.util.List;
-
-import io.btrshop.products.domain.model.BeaconObject;
-import io.btrshop.products.domain.model.Position;
-import io.btrshop.util.trilateration.NonLinearLeastSquaresSolver;
-import io.btrshop.util.trilateration.TrilaterationFunction;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -51,39 +41,6 @@ public class ActivityUtils {
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.add(frameId, fragment);
         transaction.commit();
-    }
-
-    public static Position calculPosition(List<BeaconObject> listBeacon){
-
-
-        double[] distances_primi = new double[listBeacon.size()];
-        for (int i = 0; i < distances_primi.length; i++) {
-            distances_primi[i] = listBeacon.get(i).getDistance();
-        }
-
-        double[][] positions_primi = new double[listBeacon.size()][2];
-        for (int i = 0; i < positions_primi.length; i++) {
-            positions_primi[i][0] = listBeacon.get(i).getData().getMarker().getLat();
-            positions_primi[i][1] = listBeacon.get(i).getData().getMarker().getLng();
-        }
-
-        /*double[][] positions = new double[][] { { 5.0, -6.0 },
-                                                { 13.0, -15.0 },
-                                                { 21.0, -3.0 },
-                                                { 12.42, -21.2 } };
-        double[] distances = new double[] { 8.06, 13.97, 23.32, 15.31 };*/
-
-        NonLinearLeastSquaresSolver solver =
-                new NonLinearLeastSquaresSolver(
-                        new TrilaterationFunction(positions_primi, distances_primi),
-                        new LevenbergMarquardtOptimizer());
-
-        LeastSquaresOptimizer.Optimum optimum = solver.solve();
-
-        double[] calculatedPosition =  optimum.getPoint().toArray();
-        return new Position(calculatedPosition[0], calculatedPosition[1]);
-
-
     }
 
 }

@@ -10,11 +10,8 @@ import com.estimote.sdk.eddystone.Eddystone;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
 
-import io.btrshop.products.domain.model.BeaconData;
-import io.btrshop.products.domain.model.BeaconObject;
+import io.btrshop.products.domain.model.BeaconJson;
 
 /**
  * Created by charlie on 2/12/16.
@@ -31,7 +28,7 @@ public class ProductsBeacon {
     // Components
     private BeaconManager beaconManager;
     private Region region;
-    private List<BeaconObject> listBeacons;
+    private List<Beacon> listBeacons;
 
     protected final static String TAG = "ProductsFragment";
 
@@ -54,16 +51,12 @@ public class ProductsBeacon {
             @Override
             public void onBeaconsDiscovered(Region region, List<Beacon> list) {
                 if (!list.isEmpty()) {
-                    listBeacons = new ArrayList<BeaconObject>();
                     Log.d(TAG, "Nombres d'estimote captés: " + list.size());
                     for(Beacon beac : list){
                         Log.d(TAG, "Estimote uuid : " + beac.getProximityUUID());
                         Log.d(TAG, "Estimote distance : " + calculateDistance(beac.getMeasuredPower(), beac.getRssi()));
-                        listBeacons.add(new BeaconObject(
-                                        calculateDistance(beac.getMeasuredPower(), beac.getRssi()),
-                                        new BeaconData(beac.getProximityUUID().toString())
-                                        ));
                     }
+                    listBeacons = list;
                 }
             }
         });
@@ -103,30 +96,25 @@ public class ProductsBeacon {
         beaconManager.stopRanging(region);
     }
 
-    public List<BeaconObject> getListBeacons(Map<String, BeaconObject> mapBeacons){
-        Log.d("MAP", ""+mapBeacons.size());
-        Log.d("LIST", ""+this.listBeacons.size());
+    public List<BeaconJson> getListBeacons(){
 
-        List<BeaconObject> returnList = new ArrayList<>();
+        Log.d("LIST", ""+this.listBeacons.size());
+        List<BeaconJson> returnList = new ArrayList<>();
 
         if(this.listBeacons.isEmpty() || this.listBeacons == null)
             this.scanBeacon();
 
-        int nbBeaconCorrect = 0;
-        for (BeaconObject b : this.listBeacons ){
-            double distance = b.getDistance();
-            Log.d("BEACON", b.getData().getUuid());
-            BeaconObject beacon = mapBeacons.get(b.getData().getUuid().toUpperCase());
-            if(beacon != null) {
-                Log.d("DISTANCE", distance+ "m");
-                nbBeaconCorrect++;
-                beacon.setDistance(distance);
-                returnList.add(beacon);
-            }
+        for (Beacon b : this.listBeacons ){
+
+            double distance = calculateDistance(b.getMeasuredPower(), b.getRssi());
+            returnList.add(new BeaconJson(b.getProximityUUID().toString(), distance));
+
         }
-        Log.d("NBBEACONCORRECT", "il y a : " + nbBeaconCorrect + " beacons captés corrects");
-        if(nbBeaconCorrect < 2)
+
+        if(returnList.size() < 3){
             return null;
+        }
+
         return returnList;
     }
 

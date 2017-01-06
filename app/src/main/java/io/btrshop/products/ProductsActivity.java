@@ -31,7 +31,6 @@ import com.estimote.sdk.SystemRequirementsChecker;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -41,7 +40,6 @@ import io.btrshop.BtrShopApplication;
 import io.btrshop.R;
 import io.btrshop.detailsproduct.DetailsProductActivity;
 import io.btrshop.detailsproduct.domain.model.Product;
-import io.btrshop.products.domain.model.BeaconObject;
 import io.btrshop.scanner.ScannerActivity;
 import io.btrshop.util.EspressoIdlingResource;
 
@@ -54,7 +52,6 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
     protected final static String TAG = "ProductsFragment";
 
     ProductsBeacon beacons;
-    Map<String, BeaconObject> listBeacons;
 
     // UI
     @Inject
@@ -114,9 +111,6 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
         // Permissions and bluetooth
         verifyBluetooth();
         checkAndRequestPermissions();
-
-        Log.d("PRODACT", "GET BEACONS");
-        mProductsPresenter.getBeacons();
 
         beacons = new ProductsBeacon(this);
         beacons.scanBeacon();
@@ -236,7 +230,7 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
                         .content("Veuillez patientez ...")
                         .progress(true, 0)
                         .show();
-                mProductsPresenter.postProduct(result, beacons.getListBeacons(listBeacons));
+                mProductsPresenter.postProduct(result, beacons.getListBeacons());
             }
         }
     }
@@ -264,11 +258,6 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
                 .content(message)
                 .positiveText("Ok")
                 .show();
-    }
-
-    @Override
-    public void setBeaconsList(Map<String, BeaconObject> beaconObjects) {
-        this.listBeacons = beaconObjects;
     }
 
     private void verifyBluetooth() {
