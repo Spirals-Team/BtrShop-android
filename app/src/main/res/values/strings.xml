@@ -62,5 +62,6 @@
     <string name="info_product_model">Model</string>
     <string name="title_activity_details_product">Details Product</string>
     <string name="base_url_api">https://btrshopcloud.herokuapp.com/</string>
+    <string name="base_url_test">http://10.42.0.249:8080/</string>
 
 </resources>
