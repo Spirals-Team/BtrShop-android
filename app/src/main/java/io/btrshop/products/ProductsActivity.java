@@ -18,12 +18,18 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.PermissionChecker;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -34,12 +40,14 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import butterknife.BindBitmap;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.btrshop.BtrShopApplication;
 import io.btrshop.R;
 import io.btrshop.detailsproduct.DetailsProductActivity;
 import io.btrshop.detailsproduct.domain.model.Product;
+import io.btrshop.products.domain.adapter.ProductAdapterRecycler;
 import io.btrshop.scanner.ScannerActivity;
 import io.btrshop.util.EspressoIdlingResource;
 
@@ -53,14 +61,27 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
 
     ProductsBeacon beacons;
 
-    // UI
+    private RecyclerView.Adapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
+
+    // Présenter
     @Inject
     ProductsPresenter mProductsPresenter;
+
+    // UI
+    @BindView(R.id.swipeContainer)
+    SwipeRefreshLayout swiperecycler;
+    @BindView(R.id.no_recommandation)
+    LinearLayout noRecommandationView;
+    @BindView(R.id.recycler_product)
+    RecyclerView mRecyclerView;
     @BindView(R.id.drawer_layout)
     DrawerLayout mDrawerLayout;
     @BindView(R.id.fab_scan_article)
     FloatingActionButton fab;
     static MaterialDialog dialog;
+
+
 
     private int targetSdkVersion;
 
@@ -112,9 +133,26 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
         verifyBluetooth();
         checkAndRequestPermissions();
 
+        // Beacons
         beacons = new ProductsBeacon(this);
         beacons.scanBeacon();
 
+        // Recycler View
+        // Définir le recycler view et le layout manager
+        mLayoutManager = new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+
+        swiperecycler.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                swiperecycler.setRefreshing(true);
+                mProductsPresenter.getRecommandation(beacons.getListBeacons());
+            }
+        });
+
+        // Presenter check recommandation
+        showRecommandation(Product.getProductsItems());
+        //showNoRecommandation();
     }
 
     @Override
@@ -178,21 +216,9 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
         return result;
     }
 
-
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                // Open the navigation drawer when the home icon is selected from the toolbar.
-                mDrawerLayout.openDrawer(GravityCompat.START);
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     private void setupDrawerContent(NavigationView navigationView) {
@@ -235,6 +261,8 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
         }
     }
 
+    // VIEWS
+
     @Override
     public void showScan() {
         Intent intent = new Intent(this, ScannerActivity.class);
@@ -243,7 +271,8 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
 
     @Override
     public void showProduct(final Product product) {
-        dialog.dismiss();
+        if(dialog != null)
+            dialog.dismiss();
         Intent detailProductIntent = new Intent(this, DetailsProductActivity.class);
         detailProductIntent.putExtra("product", product);
         startActivity(detailProductIntent);
@@ -258,6 +287,47 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
                 .content(message)
                 .positiveText("Ok")
                 .show();
+    }
+
+    @Override
+    public void showRecommandation(List<Product> listProduct) {
+
+        mRecyclerView.setVisibility(View.VISIBLE);
+        noRecommandationView.setVisibility(View.GONE);
+        // Adapter pour la liste d'items
+        mAdapter = new ProductAdapterRecycler(listProduct, getApplicationContext(), mProductsPresenter);
+        mRecyclerView.setAdapter(mAdapter);
+        swiperecycler.setRefreshing(false);
+    }
+
+    @Override
+    public void showNoRecommandation() {
+        mRecyclerView.setVisibility(View.GONE);
+        noRecommandationView.setVisibility(View.VISIBLE);
+        swiperecycler.setRefreshing(false);
+    }
+
+    // MENU
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_products, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                // Open the navigation drawer when the home icon is selected from the toolbar.
+                mDrawerLayout.openDrawer(GravityCompat.START);
+                return true;
+            case R.id.action_reload:
+                mProductsPresenter.getRecommandation(beacons.getListBeacons());
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     private void verifyBluetooth() {

@@ -127,13 +127,16 @@ public class DetailsProductActivity extends AppCompatActivity implements Details
             show (dimensions, layoutDimensions, hwd);
 
             show (ean, layoutEan, product.getEan());
-            if (product.getOffers().length >= 1 && product.getOffers()[0] != null){
-                offers.setText(product.getOffers()[0].toString());
-                layoutOffers.setVisibility(View.VISIBLE);
+            if(product.getOffers() != null) {
+                if (product.getOffers().length >= 1 && product.getOffers()[0] != null) {
+                    offers.setText(product.getOffers()[0].toString());
+                    layoutOffers.setVisibility(View.VISIBLE);
+                }
             }
             show (model, layoutModel, product.getModel());
             show (name, null, product.getName());
-            show (weight, layoutWeight, product.getWeight().toString());
+            if(product.getWeight() != null)
+                show (weight, layoutWeight, product.getWeight().toString());
         }
 
 

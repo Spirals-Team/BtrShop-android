@@ -2,6 +2,7 @@ package io.btrshop.products;
 
 import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -29,6 +30,14 @@ public class ProductsPresenter implements ProductsContract.Presenter {
     public ProductsPresenter(Retrofit retrofit, ProductsContract.View mView) {
         this.retrofit = retrofit;
         this.mProductsView = mView;
+    }
+
+    @Override
+    public void presentProduct(Product product) {
+        if(product != null)
+            mProductsView.showProduct(product);
+        else
+            mProductsView.showError("This product is null!");
     }
 
     @Override
@@ -93,7 +102,40 @@ public class ProductsPresenter implements ProductsContract.Presenter {
     }
 
     @Override
-    public void start() {
+    public void getRecommandation(List<BeaconJson> listBeacon) {
+
+        if(listBeacon != null){
+            List<String> listUUID = new ArrayList<>();
+            for (BeaconJson beacon : listBeacon ){
+                listUUID.add(beacon.getUuid());
+            }
+
+            retrofit.create(ProductsService.class).getRecommandation(listUUID)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .unsubscribeOn(Schedulers.io())
+                    .subscribe(new Observer<List<Product>>() {
+                        @Override
+                        public void onCompleted() {
+
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            mProductsView.showNoRecommandation();
+                        }
+                        @Override
+                        public void onNext(List<Product> products) {
+                            if(products.isEmpty())
+                                mProductsView.showNoRecommandation();
+                            else
+                                mProductsView.showRecommandation(products);
+                        }
+                    });
+        }else {
+            mProductsView.showNoRecommandation();
+        }
 
     }
+
 }

@@ -57,6 +57,7 @@ public class ProductsBeacon {
                         Log.d(TAG, "Estimote distance : " + calculateDistance(beac.getMeasuredPower(), beac.getRssi()));
                     }
                     listBeacons = list;
+                    Log.d(TAG, "ListBeacons : "+listBeacons.size() );
                 }
             }
         });
@@ -109,10 +110,6 @@ public class ProductsBeacon {
             double distance = calculateDistance(b.getMeasuredPower(), b.getRssi());
             returnList.add(new BeaconJson(b.getProximityUUID().toString(), distance));
 
-        }
-
-        if(returnList.size() < 3){
-            return null;
         }
 
         return returnList;

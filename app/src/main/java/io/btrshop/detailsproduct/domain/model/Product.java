@@ -3,7 +3,9 @@ package io.btrshop.detailsproduct.domain.model;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by charlie on 20/10/16.
@@ -226,5 +228,15 @@ public final class Product implements Serializable{
         result = 31 * result + (weight != null ? weight.hashCode() : 0);
         result = 31 * result + (width != null ? width.hashCode() : 0);
         return result;
+    }
+
+    public static final List<Product> getProductsItems(){
+        List<Product> listOfProduct = new ArrayList<>();
+        for(int i = 1; i<=20 ; i++){
+            Product a = new Product();
+            a.setName("Produit n° " + i);
+            listOfProduct.add(a);
+        }
+        return listOfProduct;
     }
 }
