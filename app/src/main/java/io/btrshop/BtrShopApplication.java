@@ -29,8 +29,6 @@ public class BtrShopApplication extends Application {
                 .apiModule(new ApiModule(mContext.getResources().getString(R.string.base_url_api)))
                 .build();
 
-        // You can get them by adding your app on https://cloud.estimote.com/#/apps
-        EstimoteSDK.initialize(getApplicationContext(), getResources().getString(R.string.app_api), getResources().getString(R.string.app_token));
     }
 
     public static Context getContext(){
