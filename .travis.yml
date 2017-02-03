@@ -11,7 +11,5 @@ android:
     - extra-google-m2repository
     - extra-android-support
     - extra-google-google_play_services
-install :
-  - travis_wait 20
 script:
   - ./gradlew build
