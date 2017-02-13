@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.annotation.VisibleForTesting;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -85,6 +86,7 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
 
     private int targetSdkVersion;
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -151,8 +153,8 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
         });
 
         // Presenter check recommandation
-        showRecommandation(Product.getProductsItems());
-        //showNoRecommandation();
+        //showRecommandation(Product.getProductsItems());
+        showNoRecommandation();
     }
 
     @Override
@@ -170,6 +172,7 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
     }
 
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     private void checkAndRequestPermissions() {
         /* Checking for permissions */
         List<String> permissionsNeeded = new ArrayList<>();

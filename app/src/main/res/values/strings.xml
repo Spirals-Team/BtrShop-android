@@ -62,7 +62,7 @@
     <string name="info_product_model">Model</string>
     <string name="title_activity_details_product">Details Product</string>
     <string name="base_url_api">https://btrshopcloud.herokuapp.com/</string>
-    <string name="base_url_test">http://10.42.0.249:8080/</string>
+    <string name="base_url_test">http://10.42.0.84:8080/</string>
     <string name="aucune_recommandation">Il n\'y a aucune recommandation pour le moment.</string>
     <string name="ajout_multiple_plant">Appuyez pour sychroniser les recommandations</string>
     <string name="tirer_pour_synchroniser">Tirez pour synchroniser vos recommandations</string>

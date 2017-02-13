@@ -78,37 +78,37 @@ public class ProductsPresenter implements ProductsContract.Presenter {
     @Override
     public void getRecommandation(List<BeaconJson> listBeacon) {
 
-        if(listBeacon != null){
-            List<String> listUUID = new ArrayList<>();
-            for (BeaconJson beacon : listBeacon ){
-                listUUID.add(beacon.getUuid());
-            }
-
-            retrofit.create(ProductsService.class).getRecommandation(listUUID)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .unsubscribeOn(Schedulers.io())
-                    .subscribe(new Observer<List<Product>>() {
-                        @Override
-                        public void onCompleted() {
-
-                        }
-
-                        @Override
-                        public void onError(Throwable e) {
-                            mProductsView.showNoRecommandation();
-                        }
-                        @Override
-                        public void onNext(List<Product> products) {
-                            if(products.isEmpty())
-                                mProductsView.showNoRecommandation();
-                            else
-                                mProductsView.showRecommandation(products);
-                        }
-                    });
-        }else {
-            mProductsView.showNoRecommandation();
+        List<String> listUUID = new ArrayList<>();
+        for (BeaconJson beacon : listBeacon ){
+            listUUID.add(beacon.getUuid());
         }
+
+        Log.d("LISTUID" , listUUID.size()+"");
+
+        retrofit.create(ProductsService.class).getRecommandation(listUUID)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .unsubscribeOn(Schedulers.io())
+                .subscribe(new Observer<List<Product>>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.d("ERROR_RECOMMANDATIONS", e.getMessage());
+                        mProductsView.showNoRecommandation();
+                    }
+                    @Override
+                    public void onNext(List<Product> products) {
+                        Log.d("NEXT_RECOMMANDATIONS", products.size()+"");
+                        if(products.isEmpty())
+                            mProductsView.showNoRecommandation();
+                        else
+                            mProductsView.showRecommandation(products);
+                    }
+                });
 
     }
 

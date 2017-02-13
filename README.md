@@ -11,7 +11,7 @@ Android application for the project `Recommendation in situ de produits en magas
 
 ## Purpose
 
-The purpose of this application is to scan an ean barcode, and retrieve via the api server the data of the product.
+The main pur
 
 
 ## Architecture
