@@ -11,7 +11,36 @@ Android application for the project `Recommendation in situ de produits en magas
 
 ## Purpose
 
-The main pur
+The purpose of the application is to retrieve a recommendation of different products scanned.
+
+We will explain you step by step how the application works.
+
+### Screenshots
+
+The main activity is a list of recommended product. If the list is empty, it displays an empty list. The user have to swipe to refresh the list.
+
+<img src="https://www.pictshare.net/300/564d728401.png" style="width:250px;" alt="Main activity"/>
+
+If the user click on the button with the scanner, there is an
+screen with a scanner to allow the user to scan.
+
+<img src="https://www.pictshare.net/300/60cf8e6e5b.png" alt="Scanner" style="width:250px;"/>
+
+When the user have scanned his product, the application shows two kind of view.
+
+The loading
+
+<img src="https://www.pictshare.net/300/50657b87a8.png" alt="Loading" style="width:250px;"/>
+
+The error with a message
+
+<img src="https://www.pictshare.net/300/ca8def997d.png" alt="Error" />
+
+When the loading is finished, the application display the products and send the differents beacons on the server.
+
+<img src="https://www.pictshare.net/300/5ecfdcc9cb.png" alt="Product"/>
+
+<img src="https://www.pictshare.net/300/c76b8d5d76.png" alt="Product"/>
 
 
 ## Architecture
@@ -29,16 +58,3 @@ This project use the MVP CLEAN ARCHITECTURE (BLUEPRINTS) :
 ## Tests
 
 Tests are written with Espresso.
-
-## Screenshots
-
-![screenshot main activity](https://www.pictshare.net/4f04291889.jpg)
-
-![screenshot scan a product](https://www.pictshare.net/8e39bf4bc7.jpg)
-
-![screenshot error no product found](https://www.pictshare.net/6f4662ba44.jpg)
-
-![screenshot product detail 1](https://www.pictshare.net/23f53dee08.jpg)
-
-![screenshot product detail 2](https://www.pictshare.net/1ef98ee3b4.jpg)
-
