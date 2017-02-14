@@ -63,4 +63,11 @@
     <string name="title_activity_details_product">Details Product</string>
     <string name="base_url_api">https://btrshopcloud.herokuapp.com/</string>
 
+    <string name="retrieve_product">Recovery of product</string>
+    <string name="wait">Please wait ...</string>
+    <string name="problem_with_bluetooth">Bluetooth LE not supported by this device</string>
+    <string name="bluetooth_not_enable">Bluetooth not enabled</string>
+    <string name="bluetooth_not_enable_content">Please enable bluetooth in settings and restart this application.</string>
+
+
 </resources>
