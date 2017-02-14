@@ -51,8 +51,8 @@ This project use the MVP CLEAN ARCHITECTURE (BLUEPRINTS) :
 
 
 * **MVP**: Model View Presenter pattern from the base sample.
-* **Domain**: Holds all business logic. The domain layer starts with classes named *use cases* or *interactors* used by the application presenters. These *use cases* represent all the possible actions a developer can perform from the presentation layer. 
-* **Repository**: Repository pattern from the base sample.  
+* **Domain**: Holds all business logic. The domain layer starts with classes named *use cases* or *interactors* used by the application presenters. These *use cases* represent all the possible actions a developer can perform from the presentation layer.
+* **Repository**: Repository pattern from the base sample.
 
 
 ## Tests

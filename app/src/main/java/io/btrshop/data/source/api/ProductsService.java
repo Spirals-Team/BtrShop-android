@@ -20,16 +20,15 @@ import rx.Observable;
 public interface ProductsService {
 
     /**
-     * Envoie de la position de l'article et recupération de celui ci
+     * Function that retrieve the call for the product with EAN and a list of beacon.
      *
      * @param ean
-     * @param beacons
-     * @return
+     * @param listBeacon {@link BeaconJson}
+     * @return a product {@link Product}
      */
     @POST("products/{ean}")
     Observable<Product> postProduct(@Path("ean") String ean,
-                                    @Body List<BeaconJson> beacons);
-
+                                    @Body List<BeaconJson> listBeacon);
     @GET("products/recommendation")
     Observable<List<Product>> getRecommandation(@Query("uuids[]") List<String> uuidList);
 

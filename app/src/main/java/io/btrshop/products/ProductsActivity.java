@@ -55,7 +55,7 @@ import io.btrshop.util.EspressoIdlingResource;
 
 public class ProductsActivity extends AppCompatActivity implements ProductsContract.View {
 
-    // Constantes
+    // Constants
     private final static int REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS = 124;
     private final static int REQUEST_PERMISSION_PHONE_STATE = 1;
     protected final static String TAG = "ProductsFragment";
@@ -251,12 +251,12 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == 1) {
-            if (resultCode == Activity.RESULT_OK) {
+            if(resultCode == Activity.RESULT_OK){
                 String result = data.getStringExtra("result");
                 Log.d("SCAN", result);
                 dialog = new MaterialDialog.Builder(this)
-                        .title("Récupération produit")
-                        .content("Veuillez patientez ...")
+                        .title(getResources().getString(R.string.retrieve_product))
+                        .content(getResources().getString(R.string.wait))
                         .progress(true, 0)
                         .show();
                 mProductsPresenter.postProduct(result, beacons.getListBeacons());
@@ -338,10 +338,10 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
             boolean bluetoothError = false;
 
             if (Build.VERSION.SDK_INT < 18) {
-                throw new RuntimeException("Bluetooth LE not supported by this device");
+                throw new RuntimeException(getResources().getString(R.string.problem_with_bluetooth));
             }
             if (!getApplicationContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
-                throw new RuntimeException("Bluetooth LE not supported by this device");
+                throw new RuntimeException(getResources().getString(R.string.problem_with_bluetooth));
             } else {
                 if (!((BluetoothManager) getApplicationContext().getSystemService(Context.BLUETOOTH_SERVICE)).getAdapter().isEnabled()) {
                     bluetoothError = true;
@@ -349,8 +349,8 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
             }
             if (bluetoothError) {
                 dialog = new MaterialDialog.Builder(ProductsActivity.this)
-                        .title("Bluetooth not enabled")
-                        .content("Please enable bluetooth in settings and restart this application.")
+                        .title(getResources().getString(R.string.bluetooth_not_enable))
+                        .content(getResources().getString(R.string.bluetooth_not_enable_content))
                         .positiveText("Ok")
                         .onAny(new MaterialDialog.SingleButtonCallback() {
                             @Override
@@ -363,8 +363,8 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
             }
         } catch (RuntimeException e) {
             dialog = new MaterialDialog.Builder(ProductsActivity.this)
-                    .title("Bluetooth LE not available")
-                    .content("Sorry, this device does not support Bluetooth LE.")
+                    .title(getResources().getString(R.string.bluetooth_not_enable))
+                    .content(getResources().getString(R.string.bluetooth_not_enable_content))
                     .positiveText("Ok")
                     .onAny(new MaterialDialog.SingleButtonCallback() {
                         @Override
