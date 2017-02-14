@@ -13,20 +13,28 @@ import io.btrshop.products.domain.model.BeaconJson;
 
 public interface ProductsContract {
 
-    interface View extends BaseView<Presenter> {
+    interface View {
 
         void showScan();
 
         void showProduct(Product product);
 
         void showError(String message);
+
+        void showRecommandation(List<Product> listProduct);
+
+        void showNoRecommandation();
     }
 
-    interface Presenter extends BasePresenter {
+    interface Presenter{
+
+        void presentProduct(Product product);
 
         void scanProduct();
 
         void postProduct(String ean, List<BeaconJson> listBeacon);
+
+        void getRecommandation(List<BeaconJson> listBeacon);
 
     }
 }

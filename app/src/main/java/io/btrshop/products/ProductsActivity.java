@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.annotation.VisibleForTesting;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -18,12 +19,18 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.PermissionChecker;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -34,36 +41,52 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import butterknife.BindBitmap;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.btrshop.BtrShopApplication;
 import io.btrshop.R;
 import io.btrshop.detailsproduct.DetailsProductActivity;
 import io.btrshop.detailsproduct.domain.model.Product;
+import io.btrshop.products.domain.adapter.ProductAdapterRecycler;
 import io.btrshop.scanner.ScannerActivity;
 import io.btrshop.util.EspressoIdlingResource;
 
 
 public class ProductsActivity extends AppCompatActivity implements ProductsContract.View {
 
-    // Constantes
+    // Constants
     private final static int REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS = 124;
     private final static int REQUEST_PERMISSION_PHONE_STATE = 1;
     protected final static String TAG = "ProductsFragment";
 
     ProductsBeacon beacons;
 
-    // UI
+    private RecyclerView.Adapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
+
+    // Présenter
     @Inject
     ProductsPresenter mProductsPresenter;
+
+    // UI
+    @BindView(R.id.swipeContainer)
+    SwipeRefreshLayout swiperecycler;
+    @BindView(R.id.no_recommandation)
+    LinearLayout noRecommandationView;
+    @BindView(R.id.recycler_product)
+    RecyclerView mRecyclerView;
     @BindView(R.id.drawer_layout)
     DrawerLayout mDrawerLayout;
     @BindView(R.id.fab_scan_article)
     FloatingActionButton fab;
     static MaterialDialog dialog;
 
+
+
     private int targetSdkVersion;
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -112,9 +135,26 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
         verifyBluetooth();
         checkAndRequestPermissions();
 
+        // Beacons
         beacons = new ProductsBeacon(this);
         beacons.scanBeacon();
 
+        // Recycler View
+        // Définir le recycler view et le layout manager
+        mLayoutManager = new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+
+        swiperecycler.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                swiperecycler.setRefreshing(true);
+                mProductsPresenter.getRecommandation(beacons.getListBeacons());
+            }
+        });
+
+        // Presenter check recommandation
+        //showRecommandation(Product.getProductsItems());
+        showNoRecommandation();
     }
 
     @Override
@@ -132,6 +172,7 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
     }
 
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     private void checkAndRequestPermissions() {
         /* Checking for permissions */
         List<String> permissionsNeeded = new ArrayList<>();
@@ -178,21 +219,9 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
         return result;
     }
 
-
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                // Open the navigation drawer when the home icon is selected from the toolbar.
-                mDrawerLayout.openDrawer(GravityCompat.START);
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     private void setupDrawerContent(NavigationView navigationView) {
@@ -222,18 +251,20 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == 1) {
-            if (resultCode == Activity.RESULT_OK) {
+            if(resultCode == Activity.RESULT_OK){
                 String result = data.getStringExtra("result");
                 Log.d("SCAN", result);
                 dialog = new MaterialDialog.Builder(this)
-                        .title("Récupération produit")
-                        .content("Veuillez patientez ...")
+                        .title(getResources().getString(R.string.retrieve_product))
+                        .content(getResources().getString(R.string.wait))
                         .progress(true, 0)
                         .show();
                 mProductsPresenter.postProduct(result, beacons.getListBeacons());
             }
         }
     }
+
+    // VIEWS
 
     @Override
     public void showScan() {
@@ -243,7 +274,8 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
 
     @Override
     public void showProduct(final Product product) {
-        dialog.dismiss();
+        if(dialog != null)
+            dialog.dismiss();
         Intent detailProductIntent = new Intent(this, DetailsProductActivity.class);
         detailProductIntent.putExtra("product", product);
         startActivity(detailProductIntent);
@@ -260,15 +292,56 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
                 .show();
     }
 
+    @Override
+    public void showRecommandation(List<Product> listProduct) {
+
+        mRecyclerView.setVisibility(View.VISIBLE);
+        noRecommandationView.setVisibility(View.GONE);
+        // Adapter pour la liste d'items
+        mAdapter = new ProductAdapterRecycler(listProduct, getApplicationContext(), mProductsPresenter);
+        mRecyclerView.setAdapter(mAdapter);
+        swiperecycler.setRefreshing(false);
+    }
+
+    @Override
+    public void showNoRecommandation() {
+        mRecyclerView.setVisibility(View.GONE);
+        noRecommandationView.setVisibility(View.VISIBLE);
+        swiperecycler.setRefreshing(false);
+    }
+
+    // MENU
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_products, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                // Open the navigation drawer when the home icon is selected from the toolbar.
+                mDrawerLayout.openDrawer(GravityCompat.START);
+                return true;
+            case R.id.action_reload:
+                mProductsPresenter.getRecommandation(beacons.getListBeacons());
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
     private void verifyBluetooth() {
         try {
             boolean bluetoothError = false;
 
             if (Build.VERSION.SDK_INT < 18) {
-                throw new RuntimeException("Bluetooth LE not supported by this device");
+                throw new RuntimeException(getResources().getString(R.string.problem_with_bluetooth));
             }
             if (!getApplicationContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
-                throw new RuntimeException("Bluetooth LE not supported by this device");
+                throw new RuntimeException(getResources().getString(R.string.problem_with_bluetooth));
             } else {
                 if (!((BluetoothManager) getApplicationContext().getSystemService(Context.BLUETOOTH_SERVICE)).getAdapter().isEnabled()) {
                     bluetoothError = true;
@@ -276,8 +349,8 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
             }
             if (bluetoothError) {
                 dialog = new MaterialDialog.Builder(ProductsActivity.this)
-                        .title("Bluetooth not enabled")
-                        .content("Please enable bluetooth in settings and restart this application.")
+                        .title(getResources().getString(R.string.bluetooth_not_enable))
+                        .content(getResources().getString(R.string.bluetooth_not_enable_content))
                         .positiveText("Ok")
                         .onAny(new MaterialDialog.SingleButtonCallback() {
                             @Override
@@ -290,8 +363,8 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
             }
         } catch (RuntimeException e) {
             dialog = new MaterialDialog.Builder(ProductsActivity.this)
-                    .title("Bluetooth LE not available")
-                    .content("Sorry, this device does not support Bluetooth LE.")
+                    .title(getResources().getString(R.string.bluetooth_not_enable))
+                    .content(getResources().getString(R.string.bluetooth_not_enable_content))
                     .positiveText("Ok")
                     .onAny(new MaterialDialog.SingleButtonCallback() {
                         @Override

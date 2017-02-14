@@ -62,6 +62,17 @@
     <string name="info_product_model">Model</string>
     <string name="title_activity_details_product">Details Product</string>
     <string name="base_url_api">https://btrshopcloud.herokuapp.com/</string>
-    <string name="base_url_test">http://10.42.0.249:8080/</string>
+  
+    <string name="retrieve_product">Recovery of product</string>
+    <string name="wait">Please wait ...</string>
+    <string name="problem_with_bluetooth">Bluetooth LE not supported by this device</string>
+    <string name="bluetooth_not_enable">Bluetooth not enabled</string>
+    <string name="bluetooth_not_enable_content">Please enable bluetooth in settings and restart this application.</string>
+
+    <string name="aucune_recommandation">Il n\'y a aucune recommandation pour le moment.</string>
+    <string name="ajout_multiple_plant">Appuyez pour sychroniser les recommandations</string>
+    <string name="tirer_pour_synchroniser">Tirez pour synchroniser vos recommandations</string>
+    <string name="recommandations">Recommandations</string>
+    <string name="listcourse">Articles Scannés</string>
 
 </resources>

@@ -20,7 +20,7 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="fr.lille1.univ.android.architecture.btrshop.products.ProductsActivity"
+    tools:context="io.btrshop.products.ProductsActivity"
     tools:openDrawer="start">
 
     <LinearLayout
@@ -47,10 +47,58 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <FrameLayout
-                android:id="@+id/contentFrame"
+            <android.support.v4.widget.SwipeRefreshLayout
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/swipeContainer"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent">
+
+                <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+                    xmlns:app="http://schemas.android.com/apk/res-auto"
+                    xmlns:tools="http://schemas.android.com/tools"
+                    android:id="@+id/recycler_product"
+                    app:layoutManager="LinearLayoutManager"
+                    tools:listitem="@layout/product_row"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentTop="true" />
+
+            </android.support.v4.widget.SwipeRefreshLayout>
+
+            <LinearLayout
+                android:id="@+id/no_recommandation"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_centerInParent="true"
+                android:gravity="center_vertical"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/noRecommandationIcon"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_gravity="center"
+                    android:src="@mipmap/ic_reload" />
+
+                <TextView
+                    android:id="@+id/noRecommandationMain"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="@string/aucune_recommandation"
+                    />
+
+                <TextView
+                    android:id="@+id/norecommandationSync"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:text="@string/tirer_pour_synchroniser" />
+
+            </LinearLayout>
+
 
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/fab_scan_article"
@@ -59,7 +107,7 @@
                 android:layout_margin="@dimen/fab_margin"
                 android:src="@mipmap/ic_barcode"
                 app:fabSize="normal"
-                app:layout_anchor="@id/contentFrame"
+                app:layout_anchor="@id/recycler_product"
                 app:layout_anchorGravity="bottom|right|end" />
         </android.support.design.widget.CoordinatorLayout>
 

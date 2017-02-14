@@ -2,6 +2,7 @@ package io.btrshop.products;
 
 import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -32,6 +33,14 @@ public class ProductsPresenter implements ProductsContract.Presenter {
     }
 
     @Override
+    public void presentProduct(Product product) {
+        if(product != null)
+            mProductsView.showProduct(product);
+        else
+            mProductsView.showError("This product is null!");
+    }
+
+    @Override
 
     public void scanProduct() {
         mProductsView.showScan();
@@ -41,59 +50,66 @@ public class ProductsPresenter implements ProductsContract.Presenter {
     public void postProduct(String ean, List<BeaconJson> listBeacon) {
 
         checkNotNull(ean, "ean cannot be null!");
+        checkNotNull(listBeacon, "listBeacon cannot be null");
 
+        retrofit.create(ProductsService.class).postProduct(ean, listBeacon)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .unsubscribeOn(Schedulers.io())
+                .subscribe(new Observer<Product>() {
 
-        if(listBeacon != null) {
+                    @Override
+                    public void onCompleted() {
+                    }
 
-            retrofit.create(ProductsService.class).postProduct(ean, listBeacon)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .unsubscribeOn(Schedulers.io())
-                    .subscribe(new Observer<Product>() {
+                    @Override
+                    public void onError(Throwable e) {
+                        mProductsView.showError(e.getMessage());
+                    }
 
-                        @Override
-                        public void onCompleted() {
-                        }
+                    @Override
+                    public void onNext(Product product) {
+                        mProductsView.showProduct(product);
+                    }
 
-                        @Override
-                        public void onError(Throwable e) {
-                            mProductsView.showError(e.getMessage());
-                        }
-
-                        @Override
-                        public void onNext(Product product) {
-                            mProductsView.showProduct(product);
-                        }
-
-                    });
-        }else{
-            retrofit.create(ProductsService.class).getProduct(ean)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .unsubscribeOn(Schedulers.io())
-                    .subscribe(new Observer<Product>() {
-
-                        @Override
-                        public void onCompleted() {
-                        }
-
-                        @Override
-                        public void onError(Throwable e) {
-                            Log.d("ERROR", e.getMessage());
-                            mProductsView.showError(e.getMessage());
-                        }
-
-                        @Override
-                        public void onNext(Product product) {
-                            mProductsView.showProduct(product);
-                        }
-
-                    });
-        }
+                });
     }
 
     @Override
-    public void start() {
+    public void getRecommandation(List<BeaconJson> listBeacon) {
+
+        List<String> listUUID = new ArrayList<>();
+        for (BeaconJson beacon : listBeacon ){
+            listUUID.add(beacon.getUuid());
+        }
+
+        Log.d("LISTUID" , listUUID.size()+"");
+
+        retrofit.create(ProductsService.class).getRecommandation(listUUID)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .unsubscribeOn(Schedulers.io())
+                .subscribe(new Observer<List<Product>>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.d("ERROR_RECOMMANDATIONS", e.getMessage());
+                        mProductsView.showNoRecommandation();
+                    }
+                    @Override
+                    public void onNext(List<Product> products) {
+                        Log.d("NEXT_RECOMMANDATIONS", products.size()+"");
+                        if(products.isEmpty())
+                            mProductsView.showNoRecommandation();
+                        else
+                            mProductsView.showRecommandation(products);
+                    }
+                });
 
     }
+
 }

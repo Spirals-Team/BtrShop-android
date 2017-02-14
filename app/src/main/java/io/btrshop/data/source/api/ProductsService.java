@@ -8,6 +8,7 @@ import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 import rx.Observable;
 
 /**
@@ -19,17 +20,16 @@ import rx.Observable;
 public interface ProductsService {
 
     /**
-     * Envoie de la position de l'article et recupération de celui ci
+     * Function that retrieve the call for the product with EAN and a list of beacon.
      *
      * @param ean
-     * @param position
-     * @return
+     * @param listBeacon {@link BeaconJson}
+     * @return a product {@link Product}
      */
     @POST("products/{ean}")
     Observable<Product> postProduct(@Path("ean") String ean,
-                                    @Body List<BeaconJson> position);
-
-    @GET("products/{ean}")
-    Observable<Product> getProduct(@Path("ean") String ean);
+                                    @Body List<BeaconJson> listBeacon);
+    @GET("products/recommendation")
+    Observable<List<Product>> getRecommandation(@Query("uuids[]") List<String> uuidList);
 
 }

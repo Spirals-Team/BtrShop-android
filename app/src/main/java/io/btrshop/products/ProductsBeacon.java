@@ -21,6 +21,7 @@ public class ProductsBeacon {
 
     private Context pbContext;
 
+    // Constants use to calculate the distance between the phone and the beacons
     private final double COEFF1 = 0.42093;
     private final double COEFF2 = 6.9476;
     private final double COEFF3 = 0.54992;
@@ -41,12 +42,7 @@ public class ProductsBeacon {
     public void scanBeacon(){
 
         beaconManager = new BeaconManager(pbContext);
-        beaconManager.setEddystoneListener(new BeaconManager.EddystoneListener() {
-            @Override
-            public void onEddystonesFound(List<Eddystone> list) {
 
-            }
-        });
         beaconManager.setRangingListener(new BeaconManager.RangingListener() {
             @Override
             public void onBeaconsDiscovered(Region region, List<Beacon> list) {
@@ -54,9 +50,14 @@ public class ProductsBeacon {
                     Log.d(TAG, "Nombres d'estimote captés: " + list.size());
                     for(Beacon beac : list){
                         Log.d(TAG, "Estimote uuid : " + beac.getProximityUUID());
-                        Log.d(TAG, "Estimote distance : " + calculateDistance(beac.getMeasuredPower(), beac.getRssi()));
+                        try {
+                            Log.d(TAG, "Estimote distance : " + calculateDistance(beac.getMeasuredPower(), beac.getRssi()));
+                        } catch (Exception e) {
+                            Log.d(TAG, "No  distance for : " + beac.getProximityUUID());
+                        }
                     }
                     listBeacons = list;
+                    Log.d(TAG, "ListBeacons : "+listBeacons.size() );
                 }
             }
         });
@@ -66,10 +67,10 @@ public class ProductsBeacon {
 
     }
 
-
-    public double calculateDistance(int txPower, double rssi) {
+    // more information about the calcul : https://altbeacon.github.io/android-beacon-library/distance-calculations.html
+    public double calculateDistance(int txPower, double rssi) throws Exception {
         if (rssi == 0) {
-            return -1.0; // if we cannot determine accuracy, return -1.
+            throw new Exception("We cannot determine accuracy");
         }
 
         double ratio = rssi*1.0/txPower;
@@ -106,15 +107,16 @@ public class ProductsBeacon {
 
         for (Beacon b : this.listBeacons ){
 
-            double distance = calculateDistance(b.getMeasuredPower(), b.getRssi());
-            returnList.add(new BeaconJson(b.getProximityUUID().toString(), distance));
+            double distance = 0;
+            // If we can't determine an accuracy with the beacon, we don't add it to the list we return.
+            try {
+                distance = calculateDistance(b.getMeasuredPower(), b.getRssi());
+                returnList.add(new BeaconJson(b.getProximityUUID().toString(), distance));
+            } catch (Exception e) {
+                Log.d("PRODUCTBEACON", "We cannot determine an accuracy with the beacon : "+ b.getProximityUUID());
+            }
 
         }
-
-        if(returnList.size() < 3){
-            return null;
-        }
-
         return returnList;
     }
 
