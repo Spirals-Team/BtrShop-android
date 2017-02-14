@@ -57,6 +57,7 @@ public class ProductsBeacon {
                         }
                     }
                     listBeacons = list;
+                    Log.d(TAG, "ListBeacons : "+listBeacons.size() );
                 }
             }
         });
@@ -116,7 +117,6 @@ public class ProductsBeacon {
             }
 
         }
-
         return returnList;
     }
 
