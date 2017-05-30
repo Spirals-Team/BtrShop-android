@@ -8,6 +8,7 @@ import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 import rx.Observable;
 
 /**
@@ -28,5 +29,7 @@ public interface ProductsService {
     @POST("products/{ean}")
     Observable<Product> postProduct(@Path("ean") String ean,
                                     @Body List<BeaconJson> listBeacon);
+    @GET("products/recommendation")
+    Observable<List<Product>> getRecommandation(@Query("uuids[]") List<String> uuidList);
 
 }
