@@ -37,7 +37,7 @@
     <string name="choose_formats">Choose Formats</string>
     <string name="select_camera">Select a Camera</string>
     <string name="ok_button">OK</string>
-    <string name="cancel_button">Cancel</string>
+    <string name="cancel_button">Annuler</string>
     <bool name="cameraPreviewShouldFillView">true</bool>
 
     <string name="app_name">PFE</string>
@@ -74,5 +74,9 @@
     <string name="tirer_pour_synchroniser">Tirez pour synchroniser vos recommandations</string>
     <string name="recommandations">Recommandations</string>
     <string name="listcourse">Articles Scannés</string>
+
+    <string name="quantity_product">Combien d\'exemplaires en achetez-vous ?</string>
+    <string name="delete_article">Supprimer l\'article de vos achats ?</string>
+    <string name="list_prix_total">Total</string>
 
 </resources>

@@ -17,7 +17,7 @@ public interface ProductsContract {
 
         void showScan();
 
-        void showProduct(Product product);
+        void showProduct(Product product, boolean scanned);
 
         void showError(String message);
 

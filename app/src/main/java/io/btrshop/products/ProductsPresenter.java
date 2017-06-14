@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import io.btrshop.achats.AchatsActivity;
 import io.btrshop.data.source.api.ProductsService;
 import io.btrshop.detailsproduct.domain.model.Product;
 import io.btrshop.products.domain.model.BeaconJson;
@@ -35,7 +36,7 @@ public class ProductsPresenter implements ProductsContract.Presenter {
     @Override
     public void presentProduct(Product product) {
         if(product != null)
-            mProductsView.showProduct(product);
+            mProductsView.showProduct(product, false);
         else
             mProductsView.showError("This product is null!");
     }
@@ -69,7 +70,7 @@ public class ProductsPresenter implements ProductsContract.Presenter {
 
                     @Override
                     public void onNext(Product product) {
-                        mProductsView.showProduct(product);
+                        mProductsView.showProduct(product,true);
                     }
 
                 });
@@ -102,6 +103,14 @@ public class ProductsPresenter implements ProductsContract.Presenter {
                     }
                     @Override
                     public void onNext(List<Product> products) {
+                        for(Product p : AchatsActivity.listProduct){
+                            int qt = p.getQuantity();
+                            p.setQuantity(0);
+                            if(products.indexOf(p) != -1){
+                                products.remove(p);
+                            }
+                            p.setQuantity(qt);
+                        }
                         Log.d("NEXT_RECOMMANDATIONS", products.size()+"");
                         if(products.isEmpty())
                             mProductsView.showNoRecommandation();
