@@ -38,6 +38,8 @@ import com.estimote.sdk.SystemRequirementsChecker;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.inject.Inject;
 
@@ -46,6 +48,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.btrshop.BtrShopApplication;
 import io.btrshop.R;
+import io.btrshop.achats.AchatsActivity;
 import io.btrshop.detailsproduct.DetailsProductActivity;
 import io.btrshop.detailsproduct.domain.model.Product;
 import io.btrshop.products.domain.adapter.ProductAdapterRecycler;
@@ -61,6 +64,7 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
     protected final static String TAG = "ProductsFragment";
 
     ProductsBeacon beacons;
+    Timer timer;
 
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
@@ -163,6 +167,10 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
 
         SystemRequirementsChecker.checkWithDefaultDialogs(this);
         beacons.connect();
+
+        timer = new Timer();
+        TimerRecommendation mt = new TimerRecommendation();
+        timer.schedule(mt,0,20000);
     }
 
     @Override
@@ -170,7 +178,6 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
         beacons.stop();
         super.onPause();
     }
-
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void checkAndRequestPermissions() {
@@ -196,7 +203,6 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
                     REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS);
         }
     }
-
 
     public boolean selfPermissionGranted(String permission) {
         // For Android < Android M, self permissions are always granted.
@@ -231,6 +237,12 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
                     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                         switch (menuItem.getItemId()) {
                             case R.id.list_navigation_menu_item:
+                                break;
+                            case R.id.list_navigation_menu_products:
+                                //Intent intent = new Intent(ProductsActivity.this, AchatsActivity.class).setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                                Intent intent = new Intent(ProductsActivity.this, AchatsActivity.class);
+                                intent.putExtra("from","ProductsActivity");
+                                startActivity(intent);
                                 break;
                             default:
                                 break;
@@ -273,11 +285,12 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
     }
 
     @Override
-    public void showProduct(final Product product) {
+    public void showProduct(final Product product, final boolean scanned) {
         if(dialog != null)
             dialog.dismiss();
         Intent detailProductIntent = new Intent(this, DetailsProductActivity.class);
         detailProductIntent.putExtra("product", product);
+        detailProductIntent.putExtra("scanned",scanned);
         startActivity(detailProductIntent);
     }
 
@@ -378,4 +391,14 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
 
     }
 
+    class TimerRecommendation extends TimerTask {
+        public void run(){
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mProductsPresenter.getRecommandation(beacons.getListBeacons());
+                }
+            });
+        }
+    }
 }

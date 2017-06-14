@@ -61,11 +61,14 @@ public final class Product implements Serializable{
     @SerializedName("width")
     private QuantitativeValue width;
 
+    @SerializedName("quantity")
+    private int quantity;
+
 
     public Product() {
     }
 
-    public Product(String brand, String category, String color, String description, QuantitativeValue depth, String ean, QuantitativeValue height, String logo, Offer[] offers, String model, String name, QuantitativeValue weight, QuantitativeValue width) {
+    public Product(String brand, String category, String color, String description, QuantitativeValue depth, String ean, QuantitativeValue height, String logo, Offer[] offers, String model, String name, QuantitativeValue weight, QuantitativeValue width, int quantity) {
         this.brand = brand;
         this.category = category;
         this.color = color;
@@ -79,8 +82,16 @@ public final class Product implements Serializable{
         this.name = name;
         this.weight = weight;
         this.width = width;
+        this.quantity = quantity;
     }
 
+    public int getQuantity(){
+        return quantity;
+    }
+
+    public void setQuantity(int quantity){
+        this.quantity = quantity;
+    }
 
     public String getBrand() {
         return brand;

@@ -41,6 +41,7 @@
             </intent-filter>
         </activity>
         <activity android:name="io.btrshop.scanner.ScannerActivity" />
+        <activity android:name=".achats.AchatsActivity"/>
         <activity android:name=".detailsproduct.DetailsProductActivity"
             android:label="@string/title_activity_details_product"
             android:theme="@style/AppTheme"/>
