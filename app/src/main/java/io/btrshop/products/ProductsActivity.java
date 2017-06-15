@@ -27,7 +27,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -43,12 +42,11 @@ import java.util.TimerTask;
 
 import javax.inject.Inject;
 
-import butterknife.BindBitmap;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.btrshop.BtrShopApplication;
 import io.btrshop.R;
-import io.btrshop.achats.AchatsActivity;
+import io.btrshop.purchases.PurchasesActivity;
 import io.btrshop.detailsproduct.DetailsProductActivity;
 import io.btrshop.detailsproduct.domain.model.Product;
 import io.btrshop.products.domain.adapter.ProductAdapterRecycler;
@@ -76,8 +74,8 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
     // UI
     @BindView(R.id.swipeContainer)
     SwipeRefreshLayout swiperecycler;
-    @BindView(R.id.no_recommandation)
-    LinearLayout noRecommandationView;
+    @BindView(R.id.no_recommendation)
+    LinearLayout noRecommendationView;
     @BindView(R.id.recycler_product)
     RecyclerView mRecyclerView;
     @BindView(R.id.drawer_layout)
@@ -152,13 +150,12 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
             @Override
             public void onRefresh() {
                 swiperecycler.setRefreshing(true);
-                mProductsPresenter.getRecommandation(beacons.getListBeacons());
+                mProductsPresenter.getRecommendations(beacons.getListBeacons());
             }
         });
 
-        // Presenter check recommandation
-        //showRecommandation(Product.getProductsItems());
-        showNoRecommandation();
+        // Presenter check recommendation
+        showNoRecommendation();
     }
 
     @Override
@@ -239,8 +236,8 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
                             case R.id.list_navigation_menu_item:
                                 break;
                             case R.id.list_navigation_menu_products:
-                                //Intent intent = new Intent(ProductsActivity.this, AchatsActivity.class).setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                                Intent intent = new Intent(ProductsActivity.this, AchatsActivity.class);
+                                //Intent intent = new Intent(ProductsActivity.this, PurchasesActivity.class).setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                                Intent intent = new Intent(ProductsActivity.this, PurchasesActivity.class);
                                 intent.putExtra("from","ProductsActivity");
                                 startActivity(intent);
                                 break;
@@ -306,10 +303,10 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
     }
 
     @Override
-    public void showRecommandation(List<Product> listProduct) {
+    public void showRecommendations(List<Product> listProduct) {
 
         mRecyclerView.setVisibility(View.VISIBLE);
-        noRecommandationView.setVisibility(View.GONE);
+        noRecommendationView.setVisibility(View.GONE);
         // Adapter pour la liste d'items
         mAdapter = new ProductAdapterRecycler(listProduct, getApplicationContext(), mProductsPresenter);
         mRecyclerView.setAdapter(mAdapter);
@@ -317,9 +314,9 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
     }
 
     @Override
-    public void showNoRecommandation() {
+    public void showNoRecommendation() {
         mRecyclerView.setVisibility(View.GONE);
-        noRecommandationView.setVisibility(View.VISIBLE);
+        noRecommendationView.setVisibility(View.VISIBLE);
         swiperecycler.setRefreshing(false);
     }
 
@@ -339,7 +336,7 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
                 mDrawerLayout.openDrawer(GravityCompat.START);
                 return true;
             case R.id.action_reload:
-                mProductsPresenter.getRecommandation(beacons.getListBeacons());
+                mProductsPresenter.getRecommendations(beacons.getListBeacons());
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -396,7 +393,7 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    mProductsPresenter.getRecommandation(beacons.getListBeacons());
+                    mProductsPresenter.getRecommendations(beacons.getListBeacons());
                 }
             });
         }

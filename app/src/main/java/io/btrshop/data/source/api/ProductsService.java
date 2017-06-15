@@ -30,6 +30,6 @@ public interface ProductsService {
     Observable<Product> postProduct(@Path("ean") String ean,
                                     @Body List<BeaconJson> listBeacon);
     @GET("products/recommendation")
-    Observable<List<Product>> getRecommandation(@Query("uuids[]") List<String> uuidList);
+    Observable<List<Product>> getRecommendations(@Query("uuids[]") List<String> uuidList);
 
 }

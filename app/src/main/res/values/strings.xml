@@ -69,14 +69,14 @@
     <string name="bluetooth_not_enable">Bluetooth not enabled</string>
     <string name="bluetooth_not_enable_content">Please enable bluetooth in settings and restart this application.</string>
 
-    <string name="aucune_recommandation">Il n\'y a aucune recommandation pour le moment.</string>
+    <string name="no_recommendation">Il n\'y a aucune recommandation pour le moment.</string>
     <string name="ajout_multiple_plant">Appuyez pour sychroniser les recommandations</string>
-    <string name="tirer_pour_synchroniser">Tirez pour synchroniser vos recommandations</string>
-    <string name="recommandations">Recommandations</string>
-    <string name="listcourse">Articles Scannés</string>
+    <string name="swipe_to_refresh">Tirez pour synchroniser vos recommandations</string>
+    <string name="recommendations">Recommandations</string>
+    <string name="purchasesList">Articles Scannés</string>
 
     <string name="quantity_product">Combien d\'exemplaires en achetez-vous ?</string>
     <string name="delete_article">Supprimer l\'article de vos achats ?</string>
-    <string name="list_prix_total">Total</string>
+    <string name="list_global_price">Total</string>
 
 </resources>

@@ -17,7 +17,6 @@ import java.net.URL;
 import java.util.List;
 
 import io.btrshop.R;
-import io.btrshop.achats.AchatsActivity;
 import io.btrshop.detailsproduct.domain.model.Product;
 import io.btrshop.products.ProductsPresenter;
 
@@ -35,17 +34,17 @@ public class ProductAdapterRecycler extends RecyclerView.Adapter<ProductAdapterR
 
     public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener
     {
-        public TextView titre ;
+        public TextView title;
         public TextView description;
-        public TextView prix;
+        public TextView price;
         public ImageView image ;
         public Product product;
 
         public MyViewHolder(View view) {
             super(view);
-            titre = (TextView) view.findViewById(R.id.title_product);
+            title = (TextView) view.findViewById(R.id.title_product);
             description = (TextView) view.findViewById(R.id.description_product);
-            prix = (TextView) view.findViewById(R.id.price_product);
+            price = (TextView) view.findViewById(R.id.price_product);
             image = (ImageView) view.findViewById(R.id.img_product);
             view.setOnClickListener(this);
         }
@@ -95,9 +94,9 @@ public class ProductAdapterRecycler extends RecyclerView.Adapter<ProductAdapterR
             }
 
         }.execute();
-        holder.titre.setText(String.valueOf(product.getName()));
+        holder.title.setText(String.valueOf(product.getName()));
         holder.description.setText(String.valueOf(product.getDescription()));
-        holder.prix.setText(String.valueOf(product.getOffers()[0].getPrice()) + " " + String.valueOf(product.getOffers()[0].getPriceCurrency()));
+        holder.price.setText(String.valueOf(product.getOffers()[0].getPrice()) + " " + String.valueOf(product.getOffers()[0].getPriceCurrency()));
     }
 
     @Override

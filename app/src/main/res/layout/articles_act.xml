@@ -67,7 +67,7 @@
             </android.support.v4.widget.SwipeRefreshLayout>
 
             <LinearLayout
-                android:id="@+id/no_recommandation"
+                android:id="@+id/no_recommendation"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_centerInParent="true"
@@ -75,27 +75,27 @@
                 android:orientation="vertical">
 
                 <ImageView
-                    android:id="@+id/noRecommandationIcon"
+                    android:id="@+id/noRecommendationIcon"
                     android:layout_width="48dp"
                     android:layout_height="48dp"
                     android:layout_gravity="center"
                     android:src="@mipmap/ic_reload" />
 
                 <TextView
-                    android:id="@+id/noRecommandationMain"
+                    android:id="@+id/noRecommendationMain"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:text="@string/aucune_recommandation"
+                    android:text="@string/no_recommendation"
                     />
 
                 <TextView
-                    android:id="@+id/norecommandationSync"
+                    android:id="@+id/norecommendationSync"
                     android:layout_width="wrap_content"
                     android:layout_height="48dp"
                     android:layout_gravity="center"
                     android:gravity="center"
-                    android:text="@string/tirer_pour_synchroniser" />
+                    android:text="@string/swipe_to_refresh" />
 
             </LinearLayout>
 

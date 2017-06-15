@@ -4,7 +4,7 @@
     android:layout_width="match_parent" android:layout_height="wrap_content">
 
     <ImageView
-        android:id="@+id/logoArticle"
+        android:id="@+id/articleLogo"
         android:layout_width="65sp"
         android:layout_height="65sp"
         android:scaleType="fitCenter"
@@ -12,16 +12,16 @@
         android:layout_margin="5sp" />
 
     <TextView
-        android:id="@+id/nomArticle"
+        android:id="@+id/articleName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:hint="nom de l'article"
         android:textSize="18dp"
         android:textColor="@color/secondary_text"
-        android:layout_toRightOf="@+id/logoArticle"/>
+        android:layout_toRightOf="@+id/articleLogo"/>
 
     <ImageButton
-        android:id="@+id/supArticle"
+        android:id="@+id/articleDelete"
         android:layout_width="40sp"
         android:layout_height="65sp"
         android:scaleType="fitCenter"
@@ -31,12 +31,11 @@
         android:layout_margin="5sp"/>
 
     <TextView
-        android:id="@+id/prix_quantiteArticle"
+        android:id="@+id/articlePriceQuantity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:hint="prix des articles"
         android:textSize="18dp"
         android:textColor="@color/secondary_text"
-        android:layout_below="@+id/nomArticle"
-        android:layout_toEndOf="@+id/logoArticle" />
+        android:layout_below="@+id/articleName"
+        android:layout_toEndOf="@+id/articleLogo" />
 </RelativeLayout>

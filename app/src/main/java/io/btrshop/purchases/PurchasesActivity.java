@@ -1,4 +1,4 @@
-package io.btrshop.achats;
+package io.btrshop.purchases;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -29,12 +29,12 @@ import io.btrshop.products.ProductsActivity;
  * Created by martin on 19/05/2017.
  */
 
-public class AchatsActivity extends AppCompatActivity implements AchatsContract.View,
-        AchatsAdapter.AchatsAdapterListener {
+public class PurchasesActivity extends AppCompatActivity implements PurchasesContract.View,
+        PurchasesAdapter.PurchasesAdapterListener {
 
     public static ArrayList<Product> listProduct = new ArrayList<>();
     protected static ListView list = null;
-    protected static AchatsAdapter adapter = null;
+    protected static PurchasesAdapter adapter = null;
     protected static double total = 0;
     protected static String price_currency = "€";
 
@@ -57,7 +57,7 @@ public class AchatsActivity extends AppCompatActivity implements AchatsContract.
                     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                         switch (menuItem.getItemId()) {
                             case R.id.list_navigation_menu_item:
-                                Intent intent = new Intent(AchatsActivity.this, ProductsActivity.class).setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                                Intent intent = new Intent(PurchasesActivity.this, ProductsActivity.class).setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                                 startActivity(intent);
                                 break;
                             case R.id.list_navigation_menu_products:
@@ -87,15 +87,15 @@ public class AchatsActivity extends AppCompatActivity implements AchatsContract.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.achats_act);
+        setContentView(R.layout.purchases_act);
 
         setupToolbar();
 
         // Injection
         ButterKnife.bind(this);
-        DaggerAchatsComponent.builder()
+        DaggerPurchasesComponent.builder()
                 .apiComponent(((BtrShopApplication) getApplicationContext()).getApiComponent())
-                .achatsModule(new AchatsModule(this))
+                .purchasesModule(new PurchasesModule(this))
                 .build().inject(this);
 
         // Set up the toolbar.
@@ -112,7 +112,7 @@ public class AchatsActivity extends AppCompatActivity implements AchatsContract.
             setupDrawerContent(navigationView);
         }
 
-        TextView tv = (TextView) findViewById(R.id.prixArticles);
+        TextView tv = (TextView) findViewById(R.id.priceArticles);
         tv.setText(String.valueOf(total));
     }
 
@@ -120,7 +120,7 @@ public class AchatsActivity extends AppCompatActivity implements AchatsContract.
     protected void onResume() {
         super.onResume();
 
-        adapter = new AchatsAdapter(this,listProduct);
+        adapter = new PurchasesAdapter(this,listProduct);
         adapter.addListener(this);
         list = (ListView) findViewById(R.id.list_articles);
         list.setAdapter(adapter);
@@ -158,14 +158,14 @@ public class AchatsActivity extends AppCompatActivity implements AchatsContract.
             }
         }
 
-        TextView tv = (TextView) findViewById(R.id.prixArticles);
+        TextView tv = (TextView) findViewById(R.id.priceArticles);
         BigDecimal bd = new BigDecimal(total);
         bd = bd.setScale(2, BigDecimal.ROUND_UP);
         tv.setText(String.valueOf(bd.toString()) + " " + price_currency);
     }
 
     @Override
-    public void onClickSup(final Product item, int position) {
+    public void onClickDelete(final Product item, int position) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
         DialogInterface.OnClickListener onClickYes = new DialogInterface.OnClickListener() {
@@ -175,7 +175,7 @@ public class AchatsActivity extends AppCompatActivity implements AchatsContract.
                 total = total - item.getQuantity() * item.getOffers()[0].getPrice();
                 BigDecimal bd = new BigDecimal(total);
                 bd = bd.setScale(2, BigDecimal.ROUND_UP);
-                TextView tv = (TextView) findViewById(R.id.prixArticles);
+                TextView tv = (TextView) findViewById(R.id.priceArticles);
                 tv.setText(String.valueOf(bd.toString()) + " " + price_currency);
                 adapter.notifyDataSetChanged();
             }

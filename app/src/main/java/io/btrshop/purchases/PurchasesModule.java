@@ -1,4 +1,4 @@
-package io.btrshop.achats;
+package io.btrshop.purchases;
 
 import dagger.Module;
 import dagger.Provides;
@@ -9,17 +9,17 @@ import io.btrshop.util.CustomScope;
  */
 
 @Module
-public class AchatsModule {
-    private final AchatsContract.View mView;
+public class PurchasesModule {
+    private final PurchasesContract.View mView;
 
 
-    public AchatsModule(AchatsContract.View mView) {
+    public PurchasesModule(PurchasesContract.View mView) {
         this.mView = mView;
     }
 
     @Provides
     @CustomScope
-    AchatsContract.View providesAchatsContractView() {
+    PurchasesContract.View providesPurchasesContractView() {
         return mView;
     }
 }
