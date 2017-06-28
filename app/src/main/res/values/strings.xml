@@ -61,7 +61,7 @@
     <string name="info_product_offers">Offers</string>
     <string name="info_product_model">Model</string>
     <string name="title_activity_details_product">Details Product</string>
-    <string name="base_url_api">https://btrshopcloud.herokuapp.com/</string>
+    <string name="base_url_api">https://btrshop-martin.herokuapp.com/</string>
   
     <string name="retrieve_product">Recovery of product</string>
     <string name="wait">Please wait ...</string>
@@ -78,5 +78,6 @@
     <string name="quantity_product">Combien d\'exemplaires en achetez-vous ?</string>
     <string name="delete_article">Supprimer l\'article de vos achats ?</string>
     <string name="list_global_price">Total</string>
+    <string name="send_list_purchases">Confirmez-vous l\'achat de tous ces articles ?</string>
 
 </resources>

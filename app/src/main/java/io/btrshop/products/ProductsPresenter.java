@@ -42,7 +42,6 @@ public class ProductsPresenter implements ProductsContract.Presenter {
     }
 
     @Override
-
     public void scanProduct() {
         mProductsView.showScan();
     }
@@ -77,7 +76,7 @@ public class ProductsPresenter implements ProductsContract.Presenter {
     }
 
     @Override
-    public void getRecommendations(List<BeaconJson> listBeacon) {
+    public void getNearbyProducts(List<BeaconJson> listBeacon) {
 
         List<String> listUUID = new ArrayList<>();
         for (BeaconJson beacon : listBeacon ){
@@ -86,7 +85,7 @@ public class ProductsPresenter implements ProductsContract.Presenter {
 
         Log.d("LISTUID" , listUUID.size()+"");
 
-        retrofit.create(ProductsService.class).getRecommendations(listUUID)
+        retrofit.create(ProductsService.class).getNearby(listUUID)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .unsubscribeOn(Schedulers.io())

@@ -34,7 +34,7 @@ public interface ProductsContract {
 
         void postProduct(String ean, List<BeaconJson> listBeacon);
 
-        void getRecommendations(List<BeaconJson> listBeacon);
+        void getNearbyProducts(List<BeaconJson> listBeacon);
 
     }
 }

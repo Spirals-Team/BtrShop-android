@@ -4,6 +4,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -11,12 +12,19 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.MaterialDialog;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -40,6 +48,14 @@ public class PurchasesActivity extends AppCompatActivity implements PurchasesCon
 
     @BindView(R.id.drawer_layout)
     DrawerLayout mDrawerLayout;
+    @BindView(R.id.fab_finish_shopping)
+    FloatingActionButton fab;
+    @BindView(R.id.priceArticles)
+    TextView textPrices;
+    static MaterialDialog dialog;
+
+    @Inject
+    PurchasesPresenter mPresenter;
 
     public void setupToolbar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -112,8 +128,13 @@ public class PurchasesActivity extends AppCompatActivity implements PurchasesCon
             setupDrawerContent(navigationView);
         }
 
-        TextView tv = (TextView) findViewById(R.id.priceArticles);
-        tv.setText(String.valueOf(total));
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mPresenter.sendPurchases();
+            }
+        });
+        textPrices.setText(String.valueOf(total));
     }
 
     @Override
@@ -157,11 +178,9 @@ public class PurchasesActivity extends AppCompatActivity implements PurchasesCon
                 }
             }
         }
-
-        TextView tv = (TextView) findViewById(R.id.priceArticles);
         BigDecimal bd = new BigDecimal(total);
         bd = bd.setScale(2, BigDecimal.ROUND_UP);
-        tv.setText(String.valueOf(bd.toString()) + " " + price_currency);
+        textPrices.setText(String.valueOf(bd.toString()) + " " + price_currency);
     }
 
     @Override
@@ -175,8 +194,7 @@ public class PurchasesActivity extends AppCompatActivity implements PurchasesCon
                 total = total - item.getQuantity() * item.getOffers()[0].getPrice();
                 BigDecimal bd = new BigDecimal(total);
                 bd = bd.setScale(2, BigDecimal.ROUND_UP);
-                TextView tv = (TextView) findViewById(R.id.priceArticles);
-                tv.setText(String.valueOf(bd.toString()) + " " + price_currency);
+                textPrices.setText(String.valueOf(bd.toString()) + " " + price_currency);
                 adapter.notifyDataSetChanged();
             }
         };
@@ -185,5 +203,47 @@ public class PurchasesActivity extends AppCompatActivity implements PurchasesCon
         builder.setPositiveButton(R.string.ok_button,onClickYes);
         builder.setNegativeButton(R.string.cancel_button,null);
         builder.show();
+    }
+
+    @Override
+    public void showError(String message) {
+
+        dialog.dismiss();
+        new MaterialDialog.Builder(this)
+                .title("Error !")
+                .content(message)
+                .positiveText("Ok")
+                .show();
+    }
+
+    @Override
+    public void sendPurchases() {
+        if(listProduct.size() > 0) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+            DialogInterface.OnClickListener onClickYes = new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    for (Product p : listProduct) {
+                        List<String> eansProducts = new ArrayList<>();
+                        for (Product product : listProduct) {
+                            if (listProduct.indexOf(p) != listProduct.indexOf(product))
+                                eansProducts.add(product.getEan());
+                        }
+                        mPresenter.postPurchases(p.getEan(),eansProducts);
+                        Log.i("POST RECOMMEND.",eansProducts.toString());
+                    }
+                    listProduct.clear();
+                    adapter.notifyDataSetChanged();
+                    total = 0;
+                    textPrices.setText(String.valueOf(0) + " " + price_currency);
+                }
+            };
+
+            builder.setMessage(R.string.send_list_purchases);
+            builder.setPositiveButton(R.string.ok_button, onClickYes);
+            builder.setNegativeButton(R.string.cancel_button, null);
+            builder.show();
+        }
     }
 }

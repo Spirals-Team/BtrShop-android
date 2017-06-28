@@ -150,7 +150,7 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
             @Override
             public void onRefresh() {
                 swiperecycler.setRefreshing(true);
-                mProductsPresenter.getRecommendations(beacons.getListBeacons());
+                mProductsPresenter.getNearbyProducts(beacons.getListBeacons());
             }
         });
 
@@ -336,7 +336,7 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
                 mDrawerLayout.openDrawer(GravityCompat.START);
                 return true;
             case R.id.action_reload:
-                mProductsPresenter.getRecommendations(beacons.getListBeacons());
+                mProductsPresenter.getNearbyProducts(beacons.getListBeacons());
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -393,7 +393,7 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    mProductsPresenter.getRecommendations(beacons.getListBeacons());
+                    mProductsPresenter.getNearbyProducts(beacons.getListBeacons());
                 }
             });
         }

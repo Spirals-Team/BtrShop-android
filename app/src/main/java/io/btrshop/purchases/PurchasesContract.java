@@ -1,5 +1,7 @@
 package io.btrshop.purchases;
 
+import java.util.List;
+
 import io.btrshop.BasePresenter;
 import io.btrshop.BaseView;
 
@@ -9,10 +11,15 @@ import io.btrshop.BaseView;
 
 public class PurchasesContract {
     interface View extends BaseView<Presenter> {
+        void showError(String message);
 
+        void sendPurchases();
     }
 
     interface Presenter extends BasePresenter {
 
+        void sendPurchases();
+
+        void postPurchases(String ean, List<String> listEansProducts);
     }
 }
