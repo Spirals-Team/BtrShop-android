@@ -21,9 +21,9 @@ public interface ProductsContract {
 
         void showError(String message);
 
-        void showRecommandation(List<Product> listProduct);
+        void showRecommendations(List<Product> listProduct);
 
-        void showNoRecommandation();
+        void showNoRecommendation();
     }
 
     interface Presenter{
@@ -34,7 +34,7 @@ public interface ProductsContract {
 
         void postProduct(String ean, List<BeaconJson> listBeacon);
 
-        void getRecommandation(List<BeaconJson> listBeacon);
+        void getNearbyProducts(List<BeaconJson> listBeacon);
 
     }
 }

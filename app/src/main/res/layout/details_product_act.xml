@@ -84,7 +84,7 @@
                         android:visibility="gone"
                         android:layout_width="40sp"
                         android:layout_height="40sp"
-                        android:src="@drawable/chariot"
+                        android:src="@drawable/basket"
                         android:onClick="onClickAddToBasket"
                         android:background="#ebca0707"
                         android:scaleType="fitCenter"

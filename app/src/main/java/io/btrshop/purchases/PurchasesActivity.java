@@ -1,9 +1,10 @@
-package io.btrshop.achats;
+package io.btrshop.purchases;
 
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -11,12 +12,19 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.MaterialDialog;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -29,17 +37,25 @@ import io.btrshop.products.ProductsActivity;
  * Created by martin on 19/05/2017.
  */
 
-public class AchatsActivity extends AppCompatActivity implements AchatsContract.View,
-        AchatsAdapter.AchatsAdapterListener {
+public class PurchasesActivity extends AppCompatActivity implements PurchasesContract.View,
+        PurchasesAdapter.PurchasesAdapterListener {
 
     public static ArrayList<Product> listProduct = new ArrayList<>();
     protected static ListView list = null;
-    protected static AchatsAdapter adapter = null;
+    protected static PurchasesAdapter adapter = null;
     protected static double total = 0;
     protected static String price_currency = "€";
 
     @BindView(R.id.drawer_layout)
     DrawerLayout mDrawerLayout;
+    @BindView(R.id.fab_finish_shopping)
+    FloatingActionButton fab;
+    @BindView(R.id.priceArticles)
+    TextView textPrices;
+    static MaterialDialog dialog;
+
+    @Inject
+    PurchasesPresenter mPresenter;
 
     public void setupToolbar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -57,7 +73,7 @@ public class AchatsActivity extends AppCompatActivity implements AchatsContract.
                     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                         switch (menuItem.getItemId()) {
                             case R.id.list_navigation_menu_item:
-                                Intent intent = new Intent(AchatsActivity.this, ProductsActivity.class).setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                                Intent intent = new Intent(PurchasesActivity.this, ProductsActivity.class).setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                                 startActivity(intent);
                                 break;
                             case R.id.list_navigation_menu_products:
@@ -87,15 +103,15 @@ public class AchatsActivity extends AppCompatActivity implements AchatsContract.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.achats_act);
+        setContentView(R.layout.purchases_act);
 
         setupToolbar();
 
         // Injection
         ButterKnife.bind(this);
-        DaggerAchatsComponent.builder()
+        DaggerPurchasesComponent.builder()
                 .apiComponent(((BtrShopApplication) getApplicationContext()).getApiComponent())
-                .achatsModule(new AchatsModule(this))
+                .purchasesModule(new PurchasesModule(this))
                 .build().inject(this);
 
         // Set up the toolbar.
@@ -112,15 +128,20 @@ public class AchatsActivity extends AppCompatActivity implements AchatsContract.
             setupDrawerContent(navigationView);
         }
 
-        TextView tv = (TextView) findViewById(R.id.prixArticles);
-        tv.setText(String.valueOf(total));
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mPresenter.sendPurchases();
+            }
+        });
+        textPrices.setText(String.valueOf(total));
     }
 
     @Override
     protected void onResume() {
         super.onResume();
 
-        adapter = new AchatsAdapter(this,listProduct);
+        adapter = new PurchasesAdapter(this,listProduct);
         adapter.addListener(this);
         list = (ListView) findViewById(R.id.list_articles);
         list.setAdapter(adapter);
@@ -157,15 +178,13 @@ public class AchatsActivity extends AppCompatActivity implements AchatsContract.
                 }
             }
         }
-
-        TextView tv = (TextView) findViewById(R.id.prixArticles);
         BigDecimal bd = new BigDecimal(total);
         bd = bd.setScale(2, BigDecimal.ROUND_UP);
-        tv.setText(String.valueOf(bd.toString()) + " " + price_currency);
+        textPrices.setText(String.valueOf(bd.toString()) + " " + price_currency);
     }
 
     @Override
-    public void onClickSup(final Product item, int position) {
+    public void onClickDelete(final Product item, int position) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
         DialogInterface.OnClickListener onClickYes = new DialogInterface.OnClickListener() {
@@ -175,8 +194,7 @@ public class AchatsActivity extends AppCompatActivity implements AchatsContract.
                 total = total - item.getQuantity() * item.getOffers()[0].getPrice();
                 BigDecimal bd = new BigDecimal(total);
                 bd = bd.setScale(2, BigDecimal.ROUND_UP);
-                TextView tv = (TextView) findViewById(R.id.prixArticles);
-                tv.setText(String.valueOf(bd.toString()) + " " + price_currency);
+                textPrices.setText(String.valueOf(bd.toString()) + " " + price_currency);
                 adapter.notifyDataSetChanged();
             }
         };
@@ -185,5 +203,47 @@ public class AchatsActivity extends AppCompatActivity implements AchatsContract.
         builder.setPositiveButton(R.string.ok_button,onClickYes);
         builder.setNegativeButton(R.string.cancel_button,null);
         builder.show();
+    }
+
+    @Override
+    public void showError(String message) {
+
+        dialog.dismiss();
+        new MaterialDialog.Builder(this)
+                .title("Error !")
+                .content(message)
+                .positiveText("Ok")
+                .show();
+    }
+
+    @Override
+    public void sendPurchases() {
+        if(listProduct.size() > 0) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+            DialogInterface.OnClickListener onClickYes = new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    for (Product p : listProduct) {
+                        List<String> eansProducts = new ArrayList<>();
+                        for (Product product : listProduct) {
+                            if (listProduct.indexOf(p) != listProduct.indexOf(product))
+                                eansProducts.add(product.getEan());
+                        }
+                        mPresenter.postPurchases(p.getEan(),eansProducts);
+                        Log.i("POST RECOMMEND.",eansProducts.toString());
+                    }
+                    listProduct.clear();
+                    adapter.notifyDataSetChanged();
+                    total = 0;
+                    textPrices.setText(String.valueOf(0) + " " + price_currency);
+                }
+            };
+
+            builder.setMessage(R.string.send_list_purchases);
+            builder.setPositiveButton(R.string.ok_button, onClickYes);
+            builder.setNegativeButton(R.string.cancel_button, null);
+            builder.show();
+        }
     }
 }

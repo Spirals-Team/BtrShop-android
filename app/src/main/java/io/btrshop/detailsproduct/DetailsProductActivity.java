@@ -17,7 +17,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.NumberPicker;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.io.InputStream;
@@ -28,7 +27,7 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.btrshop.R;
-import io.btrshop.achats.AchatsActivity;
+import io.btrshop.purchases.PurchasesActivity;
 import io.btrshop.detailsproduct.domain.model.Product;
 
 public class DetailsProductActivity extends AppCompatActivity implements DetailsProductContract.View{
@@ -65,7 +64,7 @@ public class DetailsProductActivity extends AppCompatActivity implements Details
     @Inject
     DetailsProductPresenter mPresenter;
 
-    boolean achats = false;
+    boolean purchases = false;
 
 
     public void setupToolbar() {
@@ -91,7 +90,7 @@ public class DetailsProductActivity extends AppCompatActivity implements Details
                 .build().inject(this);
 
         Intent i = getIntent();
-        achats = i.getBooleanExtra("scanned",false);
+        purchases = i.getBooleanExtra("scanned",false);
 
         // Retrieve product
         Product p = (Product) getIntent().getSerializableExtra("product");
@@ -151,7 +150,7 @@ public class DetailsProductActivity extends AppCompatActivity implements Details
             if(product.getWeight() != null)
                 show (weight, layoutWeight, product.getWeight().toString());
 
-            if(achats) basket.setVisibility(View.VISIBLE);
+            if(purchases) basket.setVisibility(View.VISIBLE);
         }
 
 
@@ -202,7 +201,7 @@ public class DetailsProductActivity extends AppCompatActivity implements Details
                 int nbExemplaires = numberPicker.getValue();
                 Product p = (Product) getIntent().getSerializableExtra("product");
                 p.setQuantity(nbExemplaires);
-                Intent intent = new Intent(DetailsProductActivity.this,AchatsActivity.class);
+                Intent intent = new Intent(DetailsProductActivity.this,PurchasesActivity.class);
                 intent.putExtra("product",p);
                 intent.putExtra("from","DetailsProductActivity");
                 startActivity(intent);

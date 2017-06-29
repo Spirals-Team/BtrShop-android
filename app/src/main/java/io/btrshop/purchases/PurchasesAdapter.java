@@ -1,4 +1,4 @@
-package io.btrshop.achats;
+package io.btrshop.purchases;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -25,13 +25,13 @@ import io.btrshop.detailsproduct.domain.model.Product;
  * Created by martin on 18/05/2017.
  */
 
-public class AchatsAdapter extends BaseAdapter {
+public class PurchasesAdapter extends BaseAdapter {
     public List<Product> listP;
     public Context context;
     public LayoutInflater inflater;
     private Bitmap bmp;
 
-    public AchatsAdapter(Context context, List<Product> listP){
+    public PurchasesAdapter(Context context, List<Product> listP){
         this.listP = listP;
         this.context = context;
         inflater = LayoutInflater.from(context);
@@ -62,10 +62,10 @@ public class AchatsAdapter extends BaseAdapter {
             layoutItem = (RelativeLayout) convertView;
         }
 
-        final ImageView logo = (ImageView) layoutItem.findViewById(R.id.logoArticle);
-        final TextView nom = (TextView) layoutItem.findViewById(R.id.nomArticle);
-        final TextView prix = (TextView) layoutItem.findViewById(R.id.prix_quantiteArticle);
-        final ImageButton sup = (ImageButton) layoutItem.findViewById(R.id.supArticle);
+        final ImageView logo = (ImageView) layoutItem.findViewById(R.id.articleLogo);
+        final TextView name = (TextView) layoutItem.findViewById(R.id.articleName);
+        final TextView price = (TextView) layoutItem.findViewById(R.id.articlePriceQuantity);
+        final ImageButton delete = (ImageButton) layoutItem.findViewById(R.id.articleDelete);
 
         final Product p = listP.get(position);
 
@@ -90,12 +90,12 @@ public class AchatsAdapter extends BaseAdapter {
 
         }.execute();
 
-        nom.setText(p.getName());
-        prix.setText(p.getQuantity() + " x " + p.getOffers()[0].getPrice() + " " + p.getOffers()[0].getPriceCurrency());
-        sup.setImageResource(R.drawable.delete);
+        name.setText(p.getName());
+        price.setText(p.getQuantity() + " x " + p.getOffers()[0].getPrice() + " " + p.getOffers()[0].getPriceCurrency());
+        delete.setImageResource(R.drawable.delete);
 
-        sup.setTag(position);
-        sup.setOnClickListener(new View.OnClickListener(){
+        delete.setTag(position);
+        delete.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
                 Integer position = (Integer)v.getTag();
@@ -106,19 +106,19 @@ public class AchatsAdapter extends BaseAdapter {
         return layoutItem;
     }
 
-    public interface AchatsAdapterListener{
-        void onClickSup(Product item, int position);
+    public interface PurchasesAdapterListener {
+        void onClickDelete (Product item, int position);
     }
 
-    private ArrayList<AchatsAdapterListener> listListener = new ArrayList<>();
+    private ArrayList<PurchasesAdapterListener> listListener = new ArrayList<>();
 
-    public void addListener(AchatsAdapterListener listener) {
+    public void addListener(PurchasesAdapterListener listener) {
         listListener.add(listener);
     }
 
     private void sendListener(Product item, int position){
         for(int i = listListener.size()-1 ;  i>=0 ; i--){
-            listListener.get(i).onClickSup(item,position);
+            listListener.get(i).onClickDelete(item,position);
         }
     }
 }

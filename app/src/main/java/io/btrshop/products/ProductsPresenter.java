@@ -7,7 +7,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import io.btrshop.achats.AchatsActivity;
+import io.btrshop.purchases.PurchasesActivity;
 import io.btrshop.data.source.api.ProductsService;
 import io.btrshop.detailsproduct.domain.model.Product;
 import io.btrshop.products.domain.model.BeaconJson;
@@ -42,7 +42,6 @@ public class ProductsPresenter implements ProductsContract.Presenter {
     }
 
     @Override
-
     public void scanProduct() {
         mProductsView.showScan();
     }
@@ -77,7 +76,7 @@ public class ProductsPresenter implements ProductsContract.Presenter {
     }
 
     @Override
-    public void getRecommandation(List<BeaconJson> listBeacon) {
+    public void getNearbyProducts(List<BeaconJson> listBeacon) {
 
         List<String> listUUID = new ArrayList<>();
         for (BeaconJson beacon : listBeacon ){
@@ -86,7 +85,7 @@ public class ProductsPresenter implements ProductsContract.Presenter {
 
         Log.d("LISTUID" , listUUID.size()+"");
 
-        retrofit.create(ProductsService.class).getRecommandation(listUUID)
+        retrofit.create(ProductsService.class).getNearby(listUUID)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .unsubscribeOn(Schedulers.io())
@@ -98,12 +97,12 @@ public class ProductsPresenter implements ProductsContract.Presenter {
 
                     @Override
                     public void onError(Throwable e) {
-                        Log.d("ERROR_RECOMMANDATIONS", e.getMessage());
-                        mProductsView.showNoRecommandation();
+                        Log.d("ERROR_RECOMMENDATIONS", e.getMessage());
+                        mProductsView.showNoRecommendation();
                     }
                     @Override
                     public void onNext(List<Product> products) {
-                        for(Product p : AchatsActivity.listProduct){
+                        for(Product p : PurchasesActivity.listProduct){
                             int qt = p.getQuantity();
                             p.setQuantity(0);
                             if(products.indexOf(p) != -1){
@@ -111,11 +110,11 @@ public class ProductsPresenter implements ProductsContract.Presenter {
                             }
                             p.setQuantity(qt);
                         }
-                        Log.d("NEXT_RECOMMANDATIONS", products.size()+"");
+                        Log.d("NEXT_RECOMMENDATIONS", products.size()+"");
                         if(products.isEmpty())
-                            mProductsView.showNoRecommandation();
+                            mProductsView.showNoRecommendation();
                         else
-                            mProductsView.showRecommandation(products);
+                            mProductsView.showRecommendations(products);
                     }
                 });
 
