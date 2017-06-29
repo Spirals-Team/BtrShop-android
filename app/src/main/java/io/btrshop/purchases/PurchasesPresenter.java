@@ -1,5 +1,8 @@
 package io.btrshop.purchases;
 
+import android.util.Log;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -60,6 +63,37 @@ public class PurchasesPresenter implements PurchasesContract.Presenter{
                 });
     }
 
+    @Override
+    public void getAssociatedProducts(List<Product> listProducts){
+	List<String> listEan = new ArrayList<>();
+        for (Product product : listProducts ){
+            listEan.add(product.getEan());
+
+	    retrofit.create(ProductsService.class).getAssociated(listEan)
+		.subscribeOn(Schedulers.io())
+		.observeOn(AndroidSchedulers.mainThread())
+		.unsubscribeOn(Schedulers.io())
+		.subscribe(new Observer<List<Product>>() {
+			@Override
+			public void onCompleted() {
+
+			}
+
+			@Override
+			public void onError(Throwable e) {
+			    Log.d("ERROR_RECOMMENDATIONS", e.getMessage());
+			}
+			@Override
+			public void onNext(List<Product> products) {
+			    for(Product p : PurchasesActivity.listAssociated){
+				if(products.indexOf(p) != -1) products.remove(p);
+			    }
+			    mPurchasesView.addAssociatedProducts(products);
+			}
+		    });
+	}
+    }
+	
     @Override
     public void start() {
 

@@ -305,12 +305,23 @@ public class ProductsActivity extends AppCompatActivity implements ProductsContr
     @Override
     public void showRecommendations(List<Product> listProduct) {
 
-        mRecyclerView.setVisibility(View.VISIBLE);
-        noRecommendationView.setVisibility(View.GONE);
-        // Adapter pour la liste d'items
-        mAdapter = new ProductAdapterRecycler(listProduct, getApplicationContext(), mProductsPresenter);
-        mRecyclerView.setAdapter(mAdapter);
-        swiperecycler.setRefreshing(false);
+        // Get articles both in nearbylist and associatedList
+        List<Product> listRecommendation = new ArrayList<>();
+        for(Product p : PurchasesActivity.listAssociated){
+            if(listProduct.indexOf(p) != -1) listRecommendation.add(p);
+        }
+        Log.i("LIST NEARBY",String.valueOf(listProduct.size()));
+        Log.i("LIST ASSOCIATED",String.valueOf(PurchasesActivity.listAssociated.size()));
+        Log.i("LIST RECO",String.valueOf(listRecommendation.size()));
+        if(listRecommendation.size() > 0) {
+            mRecyclerView.setVisibility(View.VISIBLE);
+            noRecommendationView.setVisibility(View.GONE);
+            // Adapter pour la liste d'items
+            mAdapter = new ProductAdapterRecycler(listRecommendation, getApplicationContext(), mProductsPresenter);
+            mRecyclerView.setAdapter(mAdapter);
+            swiperecycler.setRefreshing(false);
+        }
+        else showNoRecommendation();
     }
 
     @Override

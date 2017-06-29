@@ -102,7 +102,7 @@ public class ProductsPresenter implements ProductsContract.Presenter {
                     }
                     @Override
                     public void onNext(List<Product> products) {
-                        for(Product p : PurchasesActivity.listProduct){
+                        for(Product p : PurchasesActivity.listPurchases){
                             int qt = p.getQuantity();
                             p.setQuantity(0);
                             if(products.indexOf(p) != -1){
