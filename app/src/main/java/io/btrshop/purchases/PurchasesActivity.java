@@ -40,7 +40,8 @@ import io.btrshop.products.ProductsActivity;
 public class PurchasesActivity extends AppCompatActivity implements PurchasesContract.View,
         PurchasesAdapter.PurchasesAdapterListener {
 
-    public static ArrayList<Product> listProduct = new ArrayList<>();
+    public static ArrayList<Product> listPurchases = new ArrayList<>();
+    public static ArrayList<Product> listAssociated = new ArrayList<>();
     protected static ListView list = null;
     protected static PurchasesAdapter adapter = null;
     protected static double total = 0;
@@ -141,7 +142,7 @@ public class PurchasesActivity extends AppCompatActivity implements PurchasesCon
     protected void onResume() {
         super.onResume();
 
-        adapter = new PurchasesAdapter(this,listProduct);
+        adapter = new PurchasesAdapter(this,listPurchases);
         adapter.addListener(this);
         list = (ListView) findViewById(R.id.list_articles);
         list.setAdapter(adapter);
@@ -159,22 +160,23 @@ public class PurchasesActivity extends AppCompatActivity implements PurchasesCon
                 getIntent().removeExtra("product");
                 if(product != null && product.getQuantity() > 0){
                     int indice = -1;
-                    for(Product p : listProduct){
-                        if (p.getName().equals(product.getName())) indice = listProduct.indexOf(p);
+                    for(Product p : listPurchases){
+                        if (p.getName().equals(product.getName())) indice = listPurchases.indexOf(p);
                         price_currency = p.getOffers()[0].getPriceCurrency();
                     }
                     if(indice >= 0){
-                        total = total - listProduct.get(indice).getQuantity() * listProduct.get(indice).getOffers()[0].getPrice();
-                        product.setQuantity(product.getQuantity() + listProduct.get(indice).getQuantity());
-                        listProduct.set(indice,product);
+                        total = total - listPurchases.get(indice).getQuantity() * listPurchases.get(indice).getOffers()[0].getPrice();
+                        product.setQuantity(product.getQuantity() + listPurchases.get(indice).getQuantity());
+                        listPurchases.set(indice,product);
                         total = total + product.getQuantity() * product.getOffers()[0].getPrice() ;
                     }
                     else{
-                        listProduct.add(product);
+                        listPurchases.add(product);
                         total = total +  product.getQuantity() * product.getOffers()[0].getPrice() ;
                     }
 
                     adapter.notifyDataSetChanged();
+		    mPresenter.getAssociatedProducts(listPurchases);
                 }
             }
         }
@@ -190,12 +192,14 @@ public class PurchasesActivity extends AppCompatActivity implements PurchasesCon
         DialogInterface.OnClickListener onClickYes = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                listProduct.remove(item);
+                listPurchases.remove(item);
                 total = total - item.getQuantity() * item.getOffers()[0].getPrice();
                 BigDecimal bd = new BigDecimal(total);
                 bd = bd.setScale(2, BigDecimal.ROUND_UP);
                 textPrices.setText(String.valueOf(bd.toString()) + " " + price_currency);
                 adapter.notifyDataSetChanged();
+                listAssociated.clear();
+                mPresenter.getAssociatedProducts(listAssociated);
             }
         };
 
@@ -218,22 +222,22 @@ public class PurchasesActivity extends AppCompatActivity implements PurchasesCon
 
     @Override
     public void sendPurchases() {
-        if(listProduct.size() > 0) {
+        if(listPurchases.size() > 0) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
             DialogInterface.OnClickListener onClickYes = new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    for (Product p : listProduct) {
+                    for (Product p : listPurchases) {
                         List<String> eansProducts = new ArrayList<>();
-                        for (Product product : listProduct) {
-                            if (listProduct.indexOf(p) != listProduct.indexOf(product))
+                        for (Product product : listPurchases) {
+                            if (listPurchases.indexOf(p) != listPurchases.indexOf(product))
                                 eansProducts.add(product.getEan());
                         }
                         mPresenter.postPurchases(p.getEan(),eansProducts);
                         Log.i("POST RECOMMEND.",eansProducts.toString());
                     }
-                    listProduct.clear();
+                    listPurchases.clear();
                     adapter.notifyDataSetChanged();
                     total = 0;
                     textPrices.setText(String.valueOf(0) + " " + price_currency);
@@ -244,6 +248,13 @@ public class PurchasesActivity extends AppCompatActivity implements PurchasesCon
             builder.setPositiveButton(R.string.ok_button, onClickYes);
             builder.setNegativeButton(R.string.cancel_button, null);
             builder.show();
+        }
+    }
+
+    @Override
+    public void addAssociatedProducts(List<Product> products){
+        for(Product p : products){
+            listAssociated.add(p);
         }
     }
 }

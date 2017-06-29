@@ -34,6 +34,9 @@ public interface ProductsService {
     Observable<Product> postRecommendation(@Query("ean") String ean,
                                            @Body List<String> eansList);
 
+    @GET("products/recommendation")
+    Observable<List<Product>> getAssociated(@Query("eans[]") List<String> eanList);
+
     @GET("products/nearby")
     Observable<List<Product>> getNearby(@Query("uuids[]") List<String> uuidList);
 
